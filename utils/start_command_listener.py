@@ -1,4 +1,5 @@
 import rospy
+import std_msgs
 
 class start_command_listener:
     """ Listen for the start command
