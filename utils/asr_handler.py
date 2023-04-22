@@ -2,6 +2,15 @@ import rospy
 import dynamic_reconfigure.client
 import hr_msgs
 
+class ASR_Word_Stream:
+    def __init__(self) -> None:
+        pass
+
+class ASR_Sentence_Stream:
+    def __init__(self) -> None:
+        pass
+
+
 
 class ASR_Full_Sentence:
     def __init__(self, args) -> None:
@@ -42,3 +51,5 @@ class ASR_Full_Sentence:
         self.sentence_format["audio_path"] = msg.audio_path
 
         # invoke the Dialogue manager
+
+
