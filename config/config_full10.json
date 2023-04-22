@@ -1,0 +1,23 @@
+{
+    "topic": "/grace_performance",
+    "folder": "second_stage",
+    "folder_questions": "grace_demo_initial",
+    "start_button": true,
+    "ros_topic": {
+        "emotion_topic": "/grace_proj/emotion_attention_target_person_output_topic",
+        "ASR_full_sentence": "/hr/perception/hear/sentence",
+        "ASR_word": "/hr/perception/hear/words",
+        "ASR_incremental_sentence": "/hr/perception/hear/words",
+        "interim_speech": "/hr/perception/hear/interim_speech",
+        "words": "/hr/perception/hear/words",
+        "sentence": "/hr/perception/hear/sentence",
+        "start_topic": "/grace_proj/start",
+        "stop_topic": "/grace_proj/stop",
+        "target_state_estimation_topic": "/grace_proj/emotion_attention_target_person_output_topic",
+        "toggle_attention_topic": "/grace_proj/toggle_attention",
+        "toggle_aversion_topic": "/grace_proj/toggle_aversion",
+        "toggle_nodding_topic": "/grace_proj/toggle_nodding_topic",
+        "dialogue_log_topic": "/grace_proj/dialogue_log_topic"
+    },
+    "topic_queue_size": 100
+}
