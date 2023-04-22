@@ -2,8 +2,7 @@ from pathlib import Path
 import json
 import argparse
 
-def load_config():
-    json_file_path = "./config/config_full10.json"
+def load_config(json_file_path):
     json_text = Path(json_file_path).read_text()
     config = json.loads(json_text)
     parser = argparse.ArgumentParser(

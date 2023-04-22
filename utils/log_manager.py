@@ -1,6 +1,7 @@
 import time
 import logging
 import sys
+import os
 
 def setup_logger():
     timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -13,6 +14,8 @@ def setup_logger():
     stdout_handler.setLevel(logging.DEBUG)
     stdout_handler.setFormatter(formatter)
 
+    if not os.path.exists("logs"):
+        os.mkdir("logs")
     file_handler = logging.FileHandler(
         "logs/second_stage_{}.log".format(timestr))
     file_handler.setLevel(logging.DEBUG)
