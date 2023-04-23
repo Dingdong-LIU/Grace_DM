@@ -1,10 +1,32 @@
 import rospy
 import dynamic_reconfigure.client
 import hr_msgs
+import time
 
 class ASR_Word_Stream:
-    def __init__(self) -> None:
-        pass
+    """This class listens to ASR word stream.
+    The class will store listened word and timestamp it sees an word input.
+    """
+    def __init__(self, args) -> None:
+        """Create a subscriber listen to ASR word stream - the instant word from ASR module.
+
+        Args:
+            args (Namespace): should contain a "tos_topic" namespace, which is a dict that has key "ASR_word" refer to path of ASR_word_stream
+        """
+        rospy.init_node("ASR_Word_Stream")
+        self.word_listener = rospy.Subscriber(
+            args.ros_topic["ASR_word"],
+            hr_msgs.ChatMessage,
+            self.callback,
+            queue_size=100
+        )
+        self.word = ""
+        self.timestamp = 0
+
+    def callback(self, msg):
+        self.word = msg.utterance
+        self.timestamp = time.time()
+
 
 class ASR_Sentence_Stream:
     def __init__(self) -> None:
@@ -14,14 +36,17 @@ class ASR_Sentence_Stream:
 
 class ASR_Full_Sentence:
     def __init__(self, args) -> None:
-        self.asr_language_config = self.ros_dynamic_configuration(lang="HK")
+
+        # This is the configuration of ASR. I comment this out as Yifan told me he will handle it on his side. If there's misunderstanding, please uncomment this line.
+        # self.asr_language_config = self.ros_dynamic_configuration(lang="HK")
 
         # Subscriber listening to ROS topic
         rospy.init_node("ASR_Full_Sentence_Node")
         self.full_sentence_listener = rospy.Subscriber(
             args.ros_topic['ASR_full_sentence'], 
             hr_msgs.msg.ChatMessage, 
-            self.ASR_sentence_fallback
+            self.ASR_sentence_callback,
+            queue_size=100
         )
         # Variables to be filled
         self.asr_full_sentence = None
@@ -42,7 +67,7 @@ class ASR_Full_Sentence:
         config = client.update_configuration(params)
         return config
 
-    def ASR_sentence_fallback(self, msg):
+    def ASR_sentence_callback(self, msg):
         # Update the asr message storage
         self.asr_full_sentence = msg.utterance
         self.sentence_format["lang"] = msg.lang
