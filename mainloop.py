@@ -7,18 +7,24 @@ from config.load_config import load_config
 from utils.asr_handler import ASR_Full_Sentence
 from utils.log_manager import setup_logger
 from utils.start_command_listener import start_command_listener
+from utils.mainloop_manager import time_window_manager
 
 
 
-def main_loop(asr):
+def main_loop():
     """ This is one loop happens in the main frame.
+    Basically there are 2 stages, listening stage & speaking stage.
 
     Args:
         asr (_type_): _description_
     """
-    print(asr.asr_full_sentence)
-    #Yifan note: buggy, comment out
-    #logger.info(f"ASR_FULL_SENTENCE:{asr.asr_full_sentence}")
+
+    ## print(asr_listener.asr_full_sentence) # For debug Only
+
+    # If patient is speaking, we only run emotion and vision analysis. No action will happen in this time.
+
+    # If patient is not speaking now, we think of replies.
+
 
 
 
@@ -30,9 +36,14 @@ if __name__ == "__main__":
     logger = setup_logger()
 
     # listener for start button
+    # currently not integrated to the mainloop
     start_command = start_command_listener(args)
+
     # listener for ASR
     asr_listener = ASR_Full_Sentence(args)
+
+    # time_window
+    time_window = time_window_manager(args, time_window=4)
 
     #Yifan note: no need to actively call the listener
     # start_command.listen()
@@ -40,7 +51,7 @@ if __name__ == "__main__":
     #Yifan note: put an infinite loop here just for testing
     rate = rospy.Rate(30)#30hz
     while True:
-        main_loop()
+        main_loop(asr_listener)
         rate.sleep()#Will make sure this loop runs at 30Hz
 
 
