@@ -17,7 +17,7 @@ def setup_logger():
     if not os.path.exists("logs"):
         os.mkdir("logs")
     file_handler = logging.FileHandler(
-        "logs/second_stage_{}.log".format(timestr))
+        "logs/third_stage_{}.log".format(timestr))
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
 

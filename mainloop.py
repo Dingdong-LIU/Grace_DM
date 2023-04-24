@@ -25,7 +25,7 @@ def main_loop():
         asr (_type_): _description_
     """
 
-    print(asr_listener.asr_full_sentence) # For debug Only
+    # print(asr_listener.asr_full_sentence) # For debug Only
     logger.info("enter main loop")
 
     global emergency_stop_flag
