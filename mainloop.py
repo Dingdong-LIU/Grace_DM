@@ -1,8 +1,12 @@
 import rospy
+import grace_attn_msgs.msg
 import hr_msgs.msg 
 import hr_msgs.srv
 import std_msgs.msg
-import grace_attn_msgs.msg
+
+import sys
+sys.path.insert(0, ".")
+
 from config.load_config import load_config
 from utils.asr_handler import ASR_Full_Sentence
 from utils.log_manager import setup_logger
