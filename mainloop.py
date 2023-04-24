@@ -14,7 +14,7 @@ from utils.start_command_listener import start_command_listener
 from utils.mainloop_manager import time_window_manager, engagement_estimator
 import time
 from utils.robot_trigger import action_trigger
-
+from utils.emotion_recognition_handler import Emotion_Recognition_Handeler
 
 
 def main_loop():
@@ -28,9 +28,9 @@ def main_loop():
     ## print(asr_listener.asr_full_sentence) # For debug Only
     global emergency_stop_flag
     global robot_speaking
-    global em
-    global logger
-    global time_window
+    # global em
+    # global logger
+    # global time_window
 
 
     ## Check if Grace is speaking, then don't do anything except for tracking engagement level
@@ -120,11 +120,14 @@ if __name__ == "__main__":
     # listener for ASR
     asr_listener = ASR_Full_Sentence(args, logger)
 
+    # Emotion listener
+    emotion_listener = Emotion_Recognition_Handeler(args)
+
     # time_window
     time_window = time_window_manager(args, time_window=2)
 
     # engagement estimator
-    em = engagement_estimator()
+    em = engagement_estimator(emotion_listener)
 
     # Connector to robot
     robot_connector = action_trigger()

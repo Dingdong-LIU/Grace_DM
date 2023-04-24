@@ -49,13 +49,14 @@ class time_window_manager:
 class engagement_estimator:
     """This class reades ASR, Attention, Emotion inputs and decides the strategy to use. This class runs at slower frequency (around 30hz by default settings)
     """
-    def __init__(self) -> None:
+    def __init__(self, emotion_module:Emotion_Recognition_Handeler) -> None:
         self.attention = None
         self.asr = None
         self.emotion = None
         self.state = None
+        self.emotion_module = emotion_module
 
-    def update_engagement_level(self, asr_module:Emotion_Recognition_Handeler) -> str:
+    def update_engagement_level(self) -> str:
         """Check the sensor cache and determine the patient's engagement level
 
         Args:
@@ -65,9 +66,9 @@ class engagement_estimator:
             str: Either "Engaged", "Distracted" or "Agitated"
         """
         engagement_level = "Engaged"
-        if asr_module.get_signal_state("attention") == "False":
+        if self.emotion_module.get_signal_state("attention") == "False":
             engagement_level = "Distracted"
-        if asr_module.get_signal_state("emotion") in ["Anger", "Agitation"]:
+        if self.emotion_module.get_signal_state("emotion") in ["Anger", "Agitation"]:
             engagement_level = "Agitated"
         return engagement_level
     
