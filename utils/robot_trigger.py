@@ -31,7 +31,8 @@ class action_trigger:
         req.ges_mag = self.grace_api_configs['Debug']['Sample']['ges_mag']
 
         #Call the service
-        print("Service call response is:\n %s" % self.grace_behavior_client(req))
+        success_state = self.grace_behavior_client(req)
+        print("Service call response is:\n %s" % success_state)
 
 
 

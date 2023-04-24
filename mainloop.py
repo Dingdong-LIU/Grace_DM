@@ -53,7 +53,9 @@ def main_loop():
         # await for asr_listener
         time.sleep(2)
         # TEST:
-        # robot_connector.test_send_request()
+        # robot_speaking = True
+        # exe_state = robot_connector.test_send_request()
+        # robot_speaking = False
 
     # If patient is not speaking now, we think of replies.
     else:
