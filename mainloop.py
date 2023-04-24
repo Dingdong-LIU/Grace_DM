@@ -9,6 +9,7 @@ from utils.log_manager import setup_logger
 from utils.start_command_listener import start_command_listener
 from utils.mainloop_manager import time_window_manager, engagement_estimator
 import time
+from utils.robot_trigger import action_trigger
 
 
 
@@ -51,6 +52,8 @@ def main_loop():
         # TODO: An await function to wait for chatbot reply.
         # await for asr_listener
         time.sleep(2)
+        # TEST:
+        # robot_connector.test_send_request()
 
     # If patient is not speaking now, we think of replies.
     else:
@@ -108,6 +111,10 @@ if __name__ == "__main__":
 
     # engagement estimator
     em = engagement_estimator()
+
+    # Connector to robot
+    robot_connector = action_trigger()
+
     #Yifan note: no need to actively call the listener
     # start_command.listen()
 
