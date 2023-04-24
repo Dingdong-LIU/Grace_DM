@@ -12,7 +12,7 @@ class action_trigger:
     def __init__(self) -> None:
         self.grace_api_configs = self.loadConfigs()
         #Ros routine
-        self.node = rospy.init_node("exec_test")
+        #self.node = rospy.init_node("exec_test")
         self.grace_behavior_client = rospy.ServiceProxy(self.grace_api_configs['Ros']['grace_behavior_service'], grace_attn_msgs.srv.GraceBehavior)
 
     def test_send_request(self):
@@ -39,7 +39,7 @@ class action_trigger:
     #Load configs
     def loadConfigs(self):
         #Load configs
-        with open("./Configs/config.yaml", "r") as config_file:
+        with open("./config/robot_api.yaml", "r") as config_file:
             grace_api_configs = yaml.load(config_file, Loader=yaml.FullLoader)
             print("Read successful")
         return grace_api_configs

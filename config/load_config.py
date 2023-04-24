@@ -3,6 +3,11 @@ import json
 import argparse
 
 def load_config(json_file_path):
+
+    #Yifan edit:
+    json_file_path = '/home/grace_team/HKUST_GRACE/Grace_Project/Grace_DM/config/config_full10.json'
+
+
     json_text = Path(json_file_path).read_text()
     config = json.loads(json_text)
     parser = argparse.ArgumentParser(

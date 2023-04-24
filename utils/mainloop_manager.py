@@ -1,7 +1,7 @@
 import rospy
-from asr_handler import ASR_Word_Stream
+from utils.asr_handler import ASR_Word_Stream
 import time
-from emotion_recognition_handler import Emotion_Recognition_Handeler
+from utils.emotion_recognition_handler import Emotion_Recognition_Handeler
 
 class time_window_manager:
     """This class tells the mode of Grace: ASR or NO_ASR. The class maintains an ASR_Word_Stream to monitor if there's input from user.

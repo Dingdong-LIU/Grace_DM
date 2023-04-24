@@ -4,7 +4,7 @@ from collections import deque, Counter
 
 class Emotion_Recognition_Handeler:
     def __init__(self, args) -> None:
-        rospy.init_node("emotion_recognition_node")
+        #rospy.init_node("emotion_recognition_node")
         self.emotion_sub = rospy.Subscriber(
             args.ros_topic["emotion_topic"],
             grace_attn_msgs.msg.EmotionAttentionResult,

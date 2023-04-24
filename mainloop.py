@@ -5,7 +5,7 @@ import hr_msgs.srv
 import std_msgs.msg
 
 import sys
-sys.path.insert(0, ".")
+sys.path.append("/home/grace_team/HKUST_GRACE/Grace_Project/Grace_DM")
 
 from config.load_config import load_config
 from utils.asr_handler import ASR_Full_Sentence
@@ -99,6 +99,9 @@ def main_loop():
 
 
 if __name__ == "__main__":
+    #Yifan edit:
+    main_loop_node = rospy.init_node("main_loop")
+
     # load configs
     args = load_config("./config/config_full10.json")
 
