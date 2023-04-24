@@ -28,6 +28,10 @@ def main_loop():
     ## print(asr_listener.asr_full_sentence) # For debug Only
     global emergency_stop_flag
     global robot_speaking
+    global em
+    global logger
+    global time_window
+
 
     ## Check if Grace is speaking, then don't do anything except for tracking engagement level
     engagement_state = em.update_engagement_level()
