@@ -13,6 +13,7 @@ class action_trigger:
         self.grace_api_configs = self.loadConfigs()
         #Ros routine
         #self.node = rospy.init_node("exec_test")
+        rospy.wait_for_service(self.grace_api_configs['Ros']['grace_behavior_service'])
         self.grace_behavior_client = rospy.ServiceProxy(self.grace_api_configs['Ros']['grace_behavior_service'], grace_attn_msgs.srv.GraceBehavior)
 
     def test_send_request(self):
@@ -33,6 +34,10 @@ class action_trigger:
         #Call the service
         success_state = self.grace_behavior_client(req)
         print("Service call response is:\n %s" % success_state)
+        print("start to wait for service to finish")
+        rospy.wait_for_service(self.grace_api_configs['Ros']['grace_behavior_service'], timeout=6)
+
+
 
 
 
