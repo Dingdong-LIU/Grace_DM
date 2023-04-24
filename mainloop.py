@@ -97,8 +97,8 @@ def main_loop():
 
 
 
-
 if __name__ == "__main__":
+
     #Yifan edit:
     main_loop_node = rospy.init_node("main_loop")
 
@@ -134,8 +134,10 @@ if __name__ == "__main__":
 
     #Yifan note: put an infinite loop here just for testing
     rate = rospy.Rate(30)#30hz
+
+
     while True:
-        main_loop(asr_listener)
+        main_loop()
         rate.sleep()#Will make sure this loop runs at 30Hz
 
 

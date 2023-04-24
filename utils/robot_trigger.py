@@ -39,7 +39,7 @@ class action_trigger:
     #Load configs
     def loadConfigs(self):
         #Load configs
-        with open("./config/robot_api.yaml", "r") as config_file:
+        with open("/home/grace_team/HKUST_GRACE/Grace_Project/Grace_DM/config/robot_api.yaml", "r") as config_file:
             grace_api_configs = yaml.load(config_file, Loader=yaml.FullLoader)
             print("Read successful")
         return grace_api_configs

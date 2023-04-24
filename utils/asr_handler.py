@@ -17,7 +17,7 @@ class ASR_Word_Stream:
         #rospy.init_node("ASR_Word_Stream")
         self.word_listener = rospy.Subscriber(
             args.ros_topic["ASR_word"],
-            hr_msgs.ChatMessage,
+            hr_msgs.msg.ChatMessage,
             self.callback,
             queue_size=100
         )
