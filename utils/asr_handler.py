@@ -2,12 +2,13 @@ import rospy
 import dynamic_reconfigure.client
 import hr_msgs
 import time
+from logging import Logger
 
 class ASR_Word_Stream:
     """This class listens to ASR word stream.
     The class will store listened word and timestamp it sees an word input.
     """
-    def __init__(self, args) -> None:
+    def __init__(self, args, logger:Logger) -> None:
         """Create a subscriber listen to ASR word stream - the instant word from ASR module.
 
         Args:
@@ -22,6 +23,7 @@ class ASR_Word_Stream:
         )
         self.word = ""
         self.timestamp = 0
+        self.logger = logger
 
     def callback(self, msg):
         self.word = msg.utterance
@@ -35,7 +37,7 @@ class ASR_Sentence_Stream:
 
 
 class ASR_Full_Sentence:
-    def __init__(self, args) -> None:
+    def __init__(self, args, logger:Logger) -> None:
 
         # This is the configuration of ASR. I comment this out as Yifan told me he will handle it on his side. If there's misunderstanding, please uncomment this line.
         # self.asr_language_config = self.ros_dynamic_configuration(lang="HK")
@@ -54,6 +56,7 @@ class ASR_Full_Sentence:
             "lang" : "", "confidence": 0,
             "source" : "", "audio_path": "",
         }
+        self.logger = logger
 
     def ros_dynamic_configuration(self, lang="HK"):
         """Dynamic configuration of ASR language settings, 
@@ -75,6 +78,9 @@ class ASR_Full_Sentence:
         self.sentence_format["source"] = msg.source
         self.sentence_format["audio_path"] = msg.audio_path
 
-        # invoke the Dialogue manager
+        
+        self.logger.info(f"Send {self.asr_full_sentence} to chatbot")
+        # TODO: invoke the Dialogue manager
+        # send the message to some port XXX?
 
 

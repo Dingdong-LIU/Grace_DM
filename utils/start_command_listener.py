@@ -4,7 +4,7 @@ import std_msgs
 class start_command_listener:
     """ Listen for the start command
     """
-    def __init__(self, args) -> None:
+    def __init__(self, args, logger) -> None:
         """A subscriber for "start_topic", which should be triggered by GUI. 
 
         Args:
@@ -17,6 +17,7 @@ class start_command_listener:
             callback=self.start_of_conversation_callback, 
             queue_size=100
         )
+        self.logger = logger
 
         #Yifan note: setup a rosnode
         # rospy.init_node("start_command_node")

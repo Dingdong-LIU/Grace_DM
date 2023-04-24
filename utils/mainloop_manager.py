@@ -32,7 +32,7 @@ class time_window_manager:
         self.state = False
 
     def check_asr_input(self) -> bool:
-        """Check if there is ASR input in the time_window (4s)
+        """Check if there is ASR input in the time_window (1s default)
 
         Returns:
             bool: True->ASR_Input; False->NO_ASR
@@ -56,6 +56,14 @@ class engagement_estimator:
         self.state = None
 
     def update_engagement_level(self, asr_module:Emotion_Recognition_Handeler) -> str:
+        """Check the sensor cache and determine the patient's engagement level
+
+        Args:
+            asr_module (Emotion_Recognition_Handeler): The emotional subscriber listening to emotion message.
+
+        Returns:
+            str: Either "Engaged", "Distracted" or "Agitated"
+        """
         engagement_level = "Engaged"
         if asr_module.get_signal_state("attention") == "False":
             engagement_level = "Distracted"
