@@ -43,7 +43,7 @@ if __name__ == "__main__":
     asr_listener = ASR_Full_Sentence(args)
 
     # time_window
-    time_window = time_window_manager(args, time_window=4)
+    time_window = time_window_manager(args, time_window=1)
 
     #Yifan note: no need to actively call the listener
     # start_command.listen()

@@ -1,6 +1,7 @@
 import rospy
 from asr_handler import ASR_Word_Stream
 import time
+from emotion_recognition_handler import Emotion_Recognition_Handeler
 
 class time_window_manager:
     """This class tells the mode of Grace: ASR or NO_ASR. The class maintains an ASR_Word_Stream to monitor if there's input from user.
@@ -8,12 +9,12 @@ class time_window_manager:
     bool state -> False="ASR state"; True="NO_ASR state"
 
     """
-    def __init__(self, args, time_window=4) -> None:
+    def __init__(self, args, time_window=1) -> None:
         """Init function. Create a ASR_WORD_STREAM subscriber.
 
         Args:
             args (Namespace): args for ASR_WORD_STREAM. Should contain a "tos_topic" namespace, which is a dict that has key "ASR_word" refer to path of ASR_word_stream.
-            time_window (int, optional): Timewindow for changing state. Defaults to 4 (seconds).
+            time_window (int, optional): Timewindow for changing state. Defaults to 1 (seconds).
         """
         self.state = False
         self.last_update_time = 0
@@ -46,7 +47,20 @@ class time_window_manager:
 
 
 class engagement_estimator:
-    """This class takes ASR, Gaze, Emotion inputs and decides the strategy to use. This class runs at high frequency, but outside class reads slowly.
+    """This class reades ASR, Attention, Emotion inputs and decides the strategy to use. This class runs at slower frequency (around 30hz by default settings)
     """
     def __init__(self) -> None:
-        pass
+        self.attention = None
+        self.asr = None
+        self.emotion = None
+        self.state = None
+
+    def update_engagement_level(self, asr_module:Emotion_Recognition_Handeler) -> str:
+        engagement_level = "Engaged"
+        if asr_module.get_signal_state("attention") == "False":
+            engagement_level = "Distracted"
+        if asr_module.get_signal_state("emotion") in ["Anger", "Agitation"]:
+            engagement_level = "Agitated"
+        return engagement_level
+    
+
