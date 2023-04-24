@@ -8,7 +8,7 @@ class ASR_Word_Stream:
     """This class listens to ASR word stream.
     The class will store listened word and timestamp it sees an word input.
     """
-    def __init__(self, args, logger:Logger) -> None:
+    def __init__(self, args) -> None:
         """Create a subscriber listen to ASR word stream - the instant word from ASR module.
 
         Args:
@@ -23,7 +23,7 @@ class ASR_Word_Stream:
         )
         self.word = ""
         self.timestamp = 0
-        self.logger = logger
+        # self.logger = logger
 
     def callback(self, msg):
         self.word = msg.utterance
