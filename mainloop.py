@@ -25,7 +25,9 @@ def main_loop():
         asr (_type_): _description_
     """
 
-    ## print(asr_listener.asr_full_sentence) # For debug Only
+    print(asr_listener.asr_full_sentence) # For debug Only
+    logger.info("enter main loop")
+
     global emergency_stop_flag
     global robot_speaking
     # global em
@@ -143,10 +145,11 @@ if __name__ == "__main__":
     #Yifan note: put an infinite loop here just for testing
     rate = rospy.Rate(30)#30hz
 
-
-    while True:
+    # make sure that ctrl-c can work
+    while not rospy.is_shutdown():
         main_loop()
         rate.sleep()#Will make sure this loop runs at 30Hz
+
 
 
     # ###Start Button callback from GUI###
