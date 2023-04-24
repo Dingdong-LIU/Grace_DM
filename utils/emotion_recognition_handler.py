@@ -34,9 +34,9 @@ class Emotion_Recognition_Handeler:
         """
         assert signal_name in ["attention", "emotion"], f"{signal_name} is not supported"
         queue_object = None
-        if queue_object == "attention":
+        if signal_name == "attention":
             queue_object = self.attention
-        elif queue_object == "emotion":
+        elif signal_name == "emotion":
             queue_object = self.emotion
         occurence_count = Counter(queue_object)
         attn = occurence_count.most_common(1)
