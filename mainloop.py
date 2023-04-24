@@ -26,8 +26,11 @@ def main_loop():
     """
 
     ## print(asr_listener.asr_full_sentence) # For debug Only
+    global emergency_stop_flag
+    global robot_speaking
 
     ## Check if Grace is speaking, then don't do anything except for tracking engagement level
+    engagement_state = em.update_engagement_level()
     if robot_speaking:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
@@ -43,7 +46,6 @@ def main_loop():
     speaking_state = time_window.check_asr_input()
     # If patient is speaking, we only run emotion and vision analysis. We will wait for chatbot to generate a reply.
     if speaking_state:
-        engagement_state = em.update_engagement_level()
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
             logger.debug("Currently Agitated")
@@ -72,7 +74,6 @@ def main_loop():
         
         # Patient don't answer with in time_window in if-else branch
         # Check engagement level
-        engagement_state = em.update_engagement_level()
         if engagement_state == "Distracted":
             logger.info("No feedback from patients and patient is distracted, asking robot to repeat")
             # TODO: ask chatbot to repeat the question once
