@@ -13,7 +13,7 @@ class action_trigger:
         self.grace_api_configs = self.loadConfigs()
         #Ros routine
         #self.node = rospy.init_node("exec_test")
-        rospy.wait_for_service(self.grace_api_configs['Ros']['grace_behavior_service'])
+        rospy.wait_for_service(self.grace_api_configs['Ros']['grace_behavior_service'], timeout=3)
         self.grace_behavior_client = rospy.ServiceProxy(self.grace_api_configs['Ros']['grace_behavior_service'], grace_attn_msgs.srv.GraceBehavior)
 
     def test_send_request(self):

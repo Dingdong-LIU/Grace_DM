@@ -132,7 +132,12 @@ if __name__ == "__main__":
     em = engagement_estimator(emotion_listener)
 
     # Connector to robot
-    robot_connector = action_trigger()
+    try:
+        robot_connector = action_trigger()
+    except rospy.exceptions.ROSException as e:
+        logger.error("Fail to connect to robot's custom action service \n" + str(e))
+        sys.exit(0) # comment this line if want to start mainloop without custom action APIs
+
 
     #Yifan note: no need to actively call the listener
     # start_command.listen()
