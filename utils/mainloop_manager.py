@@ -64,8 +64,8 @@ class time_window_manager:
                 self.state = 2
             elif current_time - last_word_time > self.timeout:
                 self.state = 1
-            elif current_time - last_sentence_time > self.timeout:
-                self.state = 0
+            # elif current_time - last_sentence_time > self.timeout:
+            #     self.state = 0
             
         return self.state
 

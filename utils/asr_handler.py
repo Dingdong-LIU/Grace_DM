@@ -30,6 +30,7 @@ class ASR_Word_Stream:
         self.word = msg.utterance
         self.timestamp = time.time()
         self.new_word = True
+        print(self.word)
     
     def get_time_stamp(self):
         output = (self.new_word, self.timestamp)
