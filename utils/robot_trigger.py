@@ -24,6 +24,7 @@ class action_trigger:
         return 
     def test_send_request(self):
         req = grace_attn_msgs.srv.GraceBehaviorRequest()
+        req.command = 'exec'
         req.utterance = self.grace_api_configs['Debug']['Sample']['txt']
         req.lang = self.grace_api_configs['Debug']['Sample']['lang']
 

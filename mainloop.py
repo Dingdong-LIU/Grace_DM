@@ -47,10 +47,11 @@ def main_loop():
             # 1. Pass an emergency stop to Grace. 
             # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
             # exit(0) # to be replaced by Gracefully end.
-        return
+            return
 
     speaking_state = time_window.check_asr_input()
     # If patient is speaking, we only run emotion and vision analysis. We will wait for chatbot to generate a reply.
+    logger.info(f"engagnement={engagement_state}, user_speaking={speaking_state}, robot_speaking={robot_speaking}")
     if speaking_state:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
@@ -94,7 +95,6 @@ def main_loop():
             # 2. emergency stop
             emergency_stop_flag = True
             return
-    logger.info(f"engagnement={engagement_state}, user_speaking={speaking_state}, robot_speaking={robot_speaking}")
 
         
         
