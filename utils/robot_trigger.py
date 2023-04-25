@@ -39,10 +39,10 @@ class action_trigger:
         req.ges_mag = self.grace_api_configs['Debug']['Sample']['ges_mag']
 
         #Call the service
+        print("start to wait for service to finish")
         success_state = self.grace_behavior_client(req)
         print("Service call response is:\n %s" % success_state)
-        print("start to wait for service to finish")
-        rospy.wait_for_service(self.grace_api_configs['Ros']['grace_behavior_service'], timeout=6)
+        # rospy.wait_for_service(self.grace_api_configs['Ros']['grace_behavior_service'], timeout=6)
 
 
     #Load configs

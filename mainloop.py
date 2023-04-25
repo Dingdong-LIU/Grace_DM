@@ -69,7 +69,9 @@ def main_loop():
             # 1. Pass an emergency stop to Grace. 
             # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
             # exit(0) # to be replaced by Gracefully end.
-            return
+
+
+        return
 
     # If patient is speaking, we only run emotion and vision analysis. We will wait for chatbot to generate a reply.
     if user_speaking:
@@ -86,6 +88,7 @@ def main_loop():
         wait = True
         while wait:
             wait, user_input = asr_listener.get_full_sentence()
+            print(wait)
             time.sleep(0.2)
 
         # TODO: An await function to wait for chatbot reply.
@@ -157,7 +160,7 @@ if __name__ == "__main__":
     emotion_listener = Emotion_Recognition_Handeler(args)
 
     # time_window
-    time_window = time_window_manager(args, time_window=2)
+    time_window = time_window_manager(args, time_window=0.5)
 
     # engagement estimator
     em = engagement_estimator(emotion_listener)
