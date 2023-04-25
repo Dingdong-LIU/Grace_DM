@@ -20,6 +20,8 @@ class action_trigger:
 
         self.req = grace_attn_msgs.srv.GraceBehaviorRequest()
 
+    def open_database(self):
+        return 
     def test_send_request(self):
         req = grace_attn_msgs.srv.GraceBehaviorRequest()
         req.utterance = self.grace_api_configs['Debug']['Sample']['txt']
@@ -50,7 +52,7 @@ class action_trigger:
             print("Read successful")
         return grace_api_configs
     
-    def loopup_sentence_configs(self) -> grace_attn_msgs.srv.GraceBehaviorRequest:
+    def loopup_sentence_configs(self, sentence:str) -> grace_attn_msgs.srv.GraceBehaviorRequest:
 
         return self.req
 
