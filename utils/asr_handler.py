@@ -74,7 +74,7 @@ class ASR_Full_Sentence:
 
     def ASR_sentence_callback(self, msg):
         # Update the asr message storage
-        self.asr_full_sentence = msg.utterance.data
+        self.asr_full_sentence = msg.utterance
         self.sentence_format["lang"] = msg.lang
         self.sentence_format["confidence"] = msg.confidence
         self.sentence_format["source"] = msg.source
@@ -88,6 +88,7 @@ class ASR_Full_Sentence:
 
     def get_full_sentence(self):
         if self.new_sentence:
+            self.new_sentence = False
             return (True, self.asr_full_sentence)
         else:
             return (False, self.asr_full_sentence)
