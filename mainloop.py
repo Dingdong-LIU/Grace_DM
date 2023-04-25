@@ -41,13 +41,12 @@ def main_loop():
     if robot_speaking:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
-            logger.debug("Currently Agitated")
+            logger.debug("Agitation detected during robot talking, need to end conversation now")
             # TODO: Do something
             # Stop the orientation
             # 1. Pass an emergency stop to Grace. 
             # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
-
-            pass
+            # exit(0) # to be replaced by Gracefully end.
         return
 
     speaking_state = time_window.check_asr_input()
@@ -55,7 +54,7 @@ def main_loop():
     if speaking_state:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
-            logger.debug("Currently Agitated")
+            logger.debug("Currently Agitated. Patient is agitated when he is speaking")
             # TODO: Do something
             # Stop the orientation
             # 1. Pass an emergency stop to Grace. 
@@ -95,7 +94,7 @@ def main_loop():
             # 2. emergency stop
             emergency_stop_flag = True
             return
-    logger.info(f"engagnement={engagement_state}, speaking_state={speaking_state}")
+    logger.info(f"engagnement={engagement_state}, user_speaking={speaking_state}, robot_speaking={robot_speaking}")
 
         
         
@@ -150,7 +149,7 @@ if __name__ == "__main__":
     emergency_stop_flag = False
 
     #Yifan note: put an infinite loop here just for testing
-    rate = rospy.Rate(30)#30hz
+    rate = rospy.Rate(10)#30hz
 
     # make sure that ctrl-c can work
     while not rospy.is_shutdown():
