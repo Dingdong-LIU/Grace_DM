@@ -1,11 +1,13 @@
 import rospy
 import yaml
+from argparse import Namespace
 
 import grace_attn_msgs.msg
 import grace_attn_msgs.srv
 import hr_msgs.msg
 import hr_msgs.cfg
 import hr_msgs.srv
+import std_msgs
 
 
 class action_trigger:
@@ -15,6 +17,8 @@ class action_trigger:
         #self.node = rospy.init_node("exec_test")
         rospy.wait_for_service(self.grace_api_configs['Ros']['grace_behavior_service'], timeout=3)
         self.grace_behavior_client = rospy.ServiceProxy(self.grace_api_configs['Ros']['grace_behavior_service'], grace_attn_msgs.srv.GraceBehavior)
+
+        self.req = grace_attn_msgs.srv.GraceBehaviorRequest()
 
     def test_send_request(self):
         req = grace_attn_msgs.srv.GraceBehaviorRequest()
@@ -38,9 +42,6 @@ class action_trigger:
         rospy.wait_for_service(self.grace_api_configs['Ros']['grace_behavior_service'], timeout=6)
 
 
-
-
-
     #Load configs
     def loadConfigs(self):
         #Load configs
@@ -48,7 +49,36 @@ class action_trigger:
             grace_api_configs = yaml.load(config_file, Loader=yaml.FullLoader)
             print("Read successful")
         return grace_api_configs
+    
+    def loopup_sentence_configs(self) -> grace_attn_msgs.srv.GraceBehaviorRequest:
 
+        return self.req
+
+
+
+class stop_trigger:
+    def __init__(self, args:Namespace) -> None:
+        self.stop_topic = args.ros_topic["stop_topic"]
+        self.topic_queue_size = args.topic_queue_size
+
+        self.request = hr_msgs.srv.RunByNameRequest()
+
+        self.stop_sub = rospy.Subscriber(self.stop_topic, std_msgs.msg.Bool, self.stop_msg_callback, queue_size=self.topic_queue_size)
+        self.stop_pub = rospy.Publisher(self.stop_topic , std_msgs.msg.Bool, queue_size=self.topic_queue_size)
+        self.start=False
+    
+    def stop_msg_callback(self, msg):
+        # Need a message to call the emergency stop function
+        self.stop_message = msg.data
+        
+        # if(self.stop_message == True):
+        #     self.force_stop = True #Set the flag
+        #     #Display graceful stop performance
+        #     disengage_stop = self.folder + "/disengage_stop/" + random.choice(self.conv_settings["disengage_stop"])
+        #     self.request.id =  disengage_stop
+        #     response = self.run_by_name_handle(self.request)
+        #     #Kill the current process
+        #     os.system('kill ' + str(os.getpid()))
 
 
 
