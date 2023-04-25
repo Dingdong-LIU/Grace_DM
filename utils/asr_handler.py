@@ -89,8 +89,10 @@ class ASR_Full_Sentence:
     def get_full_sentence(self):
         if self.new_sentence:
             self.new_sentence = False
-            return (True, self.asr_full_sentence)
+            wait = False
+            return (wait, self.asr_full_sentence)
         else:
-            return (False, self.asr_full_sentence)
+            wait = True
+            return (True, self.asr_full_sentence)
 
 
