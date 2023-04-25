@@ -18,8 +18,8 @@ class Emotion_Recognition_Handeler:
 
     def callback(self, msg):
         # Do with emotion messages here
-        self.attention.appendleft(msg.attention)
-        self.emotion.appendleft(msg.emotion)
+        self.attention.appendleft(msg.attention.data)
+        self.emotion.appendleft(msg.emotion.data)
         # self.visualization_frame = msg.visualization_frame
         # need to send to mainloop to trigger something.
     

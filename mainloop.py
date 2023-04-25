@@ -25,8 +25,8 @@ def main_loop():
         asr (_type_): _description_
     """
 
-    # print(asr_listener.asr_full_sentence) # For debug Only
-    logger.info("enter main loop")
+    # # print(asr_listener.asr_full_sentence) # For debug Only
+    # logger.info("enter main loop")
 
     global emergency_stop_flag
     global robot_speaking
@@ -37,6 +37,7 @@ def main_loop():
 
     ## Check if Grace is speaking, then don't do anything except for tracking engagement level
     engagement_state = em.update_engagement_level()
+    # print(engagement_state)
     if robot_speaking:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
@@ -65,9 +66,9 @@ def main_loop():
         # await for asr_listener
         time.sleep(2)
         # TEST:
-        # robot_speaking = True
-        # exe_state = robot_connector.test_send_request()
-        # robot_speaking = False
+        robot_speaking = True
+        exe_state = robot_connector.test_send_request()
+        robot_speaking = False
 
     # If patient is not speaking now, we think of replies.
     else:
