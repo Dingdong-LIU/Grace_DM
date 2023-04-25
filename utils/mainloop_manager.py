@@ -1,7 +1,8 @@
 import rospy
-from utils.asr_handler import ASR_Word_Stream
+from utils.asr_handler import ASR_Word_Stream, ASR_Full_Sentence
 import time
 from utils.emotion_recognition_handler import Emotion_Recognition_Handeler
+import logging
 
 class time_window_manager:
     """This class tells the mode of Grace: ASR or NO_ASR. The class maintains an ASR_Word_Stream to monitor if there's input from user.
@@ -9,41 +10,65 @@ class time_window_manager:
     bool state -> False="ASR state"; True="NO_ASR state"
 
     """
-    def __init__(self, args, time_window=1) -> None:
+    def __init__(self, args, time_window=0.5) -> None:
         """Init function. Create a ASR_WORD_STREAM subscriber.
 
         Args:
             args (Namespace): args for ASR_WORD_STREAM. Should contain a "tos_topic" namespace, which is a dict that has key "ASR_word" refer to path of ASR_word_stream.
-            time_window (int, optional): Timewindow for changing state. Defaults to 1 (seconds).
+            time_window (int, optional): Timewindow for changing state. Defaults to 0.5 (seconds).
         """
-        self.state = False
+        self.state = 0
+        self.logger = logging.getLogger()
         self.last_update_time = 0
         self.asr_word_stream = ASR_Word_Stream(args)
-        self.time_window = time_window
+        self.asr_full_sentence = ASR_Full_Sentence(args, self.logger)
+        self.timeout = time_window 
 
-    def asr_input(self) -> None:
-        """Change state to TRUE (ASR state)
-        """
-        self.state = True
+    # def asr_input(self) -> None:
+    #     """Change state to TRUE (ASR state)
+    #     """
+    #     self.state = True
     
-    def no_asr(self) -> None:
-        """Change state to False (NO_ASR state)
-        """
-        self.state = False
+    # def no_asr(self) -> None:
+    #     """Change state to False (NO_ASR state)
+    #     """
+    #     self.state = False
 
-    def check_asr_input(self) -> bool:
-        """Check if there is ASR input in the time_window (1s default)
+    def check_asr_input(self) -> int:
+        """Check what is the ASR state with time_window as timeout.
 
         Returns:
-            bool: True->ASR_Input; False->NO_ASR
+            int: 0: no speaking; 1 heard words, the user is speaking; 2 heard sentence, submit to chatbot.
         """
-        # no words in time_window (default 4s) seconds
-        if time.time() - self.last_update_time > self.time_window:
-            self.no_asr()
-        else:
-            self.asr_input()
-        self.last_update_time = self.asr_word_stream.timestamp
+        current_time = time.time()
+        new_word, last_word_time = self.asr_word_stream.get_time_stamp()
+        new_sentence, last_sentence_time = self.asr_full_sentence.get_time_stamp()
+        if self.state == 0: # no speaking state
+            if new_word:
+                self.state = 1
+            else:
+                self.state = 0
+            if new_sentence:
+                self.state = 2
+        if self.state == 1:
+            if current_time - last_word_time > self.timeout:
+                self.state = 0
+            elif new_sentence:
+                self.state = 2
+            elif new_word:
+                self.state = 1
+        if self.state == 2:
+            if new_sentence:
+                self.state = 2
+            elif new_word:
+                self.state = 2
+            elif current_time - last_word_time > self.timeout:
+                self.state = 1
+            elif current_time - last_sentence_time > self.timeout:
+                self.state = 0
+            
         return self.state
+
 
 
 class engagement_estimator:

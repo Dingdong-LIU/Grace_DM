@@ -23,11 +23,18 @@ class ASR_Word_Stream:
         )
         self.word = ""
         self.timestamp = 0
+        self.new_word = False
         # self.logger = logger
 
     def callback(self, msg):
         self.word = msg.utterance
         self.timestamp = time.time()
+        self.new_word = True
+    
+    def get_time_stamp(self):
+        output = (self.new_word, self.timestamp)
+        self.new_word = False
+        return output
 
 
 class ASR_Sentence_Stream:
@@ -59,6 +66,7 @@ class ASR_Full_Sentence:
         self.logger = logger
 
         self.new_sentence = False
+        self.timestamp = 0
 
     def ros_dynamic_configuration(self, lang="HK"):
         """Dynamic configuration of ASR language settings, 
@@ -83,7 +91,8 @@ class ASR_Full_Sentence:
         
         self.logger.info(f"Send {self.asr_full_sentence} to chatbot")
         self.new_sentence = True
-        # TODO: invoke the Dialogue manager
+        self.timestamp = time.time()
+        # TODO: invoke the Dialogue manager?
         # send the message to some port XXX?
 
     def get_full_sentence(self):
@@ -94,5 +103,10 @@ class ASR_Full_Sentence:
         else:
             wait = True
             return (wait, self.asr_full_sentence)
+    
+    def get_time_stamp(self):
+        output = (self.new_sentence, self.timestamp)
+        self.new_sentence = False
+        return output
 
 

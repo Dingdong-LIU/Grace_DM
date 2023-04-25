@@ -43,7 +43,7 @@ def main_loop():
     # logger.info("enter main loop")
 
     global emergency_stop_flag
-    global user_speaking
+    global user_speaking_state
     global robot_speaking
     # global em
     # global logger
@@ -53,12 +53,12 @@ def main_loop():
     ## Check if Grace is speaking, then don't do anything except for tracking engagement level
     engagement_state = em.update_engagement_level()
 
-    user_speaking = time_window.check_asr_input()
+    user_speaking_state = timeout.check_asr_input()
     # receive word --> speaking; receive sentence --> not speaking
 
 
 
-    logger.info(f"engagnement={engagement_state}, user_speaking={user_speaking}, robot_speaking={robot_speaking}")
+    logger.info(f"engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
 
     # print(engagement_state)
     if robot_speaking:
@@ -73,10 +73,9 @@ def main_loop():
             return
         return
 
-        return
 
     # If patient is speaking, we only run emotion and vision analysis. We will wait for chatbot to generate a reply.
-    if user_speaking:
+    if user_speaking_state == 1:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
             logger.debug("Currently Agitated. Patient is agitated when he is speaking")
@@ -85,13 +84,17 @@ def main_loop():
             # 1. Pass an emergency stop to Grace. 
             # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
             return
+    # When ASR recieves a full sentence, send it to chat bot immediately
+    elif user_speaking_state == 2:
         
+
         # wait_user_till_he_stop
-        wait = True
-        while wait:
-            wait, user_input = asr_listener.get_full_sentence()
-            print(wait)
-            time.sleep(0.2)
+        # wait = True
+        # while wait:
+        #     wait, user_input = asr_listener.get_full_sentence()
+        #     print(wait)
+        #     time.sleep(0.2)
+        # wait, user_input = asr_listener.get_full_sentence()
 
         # TODO: An await function to wait for chatbot reply.
         # await for asr_listener
@@ -106,7 +109,7 @@ def main_loop():
 
 
     # If patient is not speaking now, we think of replies.
-    else:
+    elif user_speaking_state == 0:
         # Handle the emergency stop when patient stop speaking
         if emergency_stop_flag:
             logger.debug("Emergency stop due to agitation")
@@ -130,6 +133,9 @@ def main_loop():
             # 2. emergency stop
             emergency_stop_flag = True
             return
+    else:
+        logger.error(f"user speaking state not in 1,2,3, is {user_speaking_state}")
+        sys.exit(-1)
 
         
         
@@ -162,7 +168,7 @@ if __name__ == "__main__":
     emotion_listener = Emotion_Recognition_Handeler(args)
 
     # time_window
-    time_window = time_window_manager(args, time_window=0.5)
+    timeout = time_window_manager(args, time_window=0.5)
 
     # engagement estimator
     em = engagement_estimator(emotion_listener)
@@ -179,7 +185,7 @@ if __name__ == "__main__":
     # start_command.listen()
 
     #Speaking state var
-    user_speaking = False
+    user_speaking_state = False
 
     # Whether Grace is speaking
     robot_speaking = False
