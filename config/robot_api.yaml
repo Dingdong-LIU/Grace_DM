@@ -57,7 +57,7 @@ Debug:
   bardging_in_switch_topic: "/grace_proj/stop_bardging_handling"
 
   Sample:
-    txt: "Hello, this is a test script."
+    txt: "Hello, this is a test script. 1,2,3,4,5,6,7,8,9,10."
     lang: *id_lang_eng
 
     expressions: ['happy','fear']

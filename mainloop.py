@@ -24,6 +24,7 @@ class multithread_action_wrapper(Thread):
     
     def run(self):
         global robot_speaking
+        global logger
         logger.info("Start to pass actions to robot")
         robot_speaking = True
         robot_connector.test_send_request()
@@ -50,6 +51,11 @@ def main_loop():
 
     ## Check if Grace is speaking, then don't do anything except for tracking engagement level
     engagement_state = em.update_engagement_level()
+
+    speaking_state = time_window.check_asr_input()
+    # If patient is speaking, we only run emotion and vision analysis. We will wait for chatbot to generate a reply.
+    logger.info(f"engagnement={engagement_state}, user_speaking={speaking_state}, robot_speaking={robot_speaking}")
+
     # print(engagement_state)
     if robot_speaking:
         if engagement_state == "Agitated":
@@ -62,9 +68,6 @@ def main_loop():
             # exit(0) # to be replaced by Gracefully end.
             return
 
-    speaking_state = time_window.check_asr_input()
-    # If patient is speaking, we only run emotion and vision analysis. We will wait for chatbot to generate a reply.
-    logger.info(f"engagnement={engagement_state}, user_speaking={speaking_state}, robot_speaking={robot_speaking}")
     if speaking_state:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
@@ -83,7 +86,7 @@ def main_loop():
         # exe_state = robot_connector.test_send_request()
         # robot_speaking = False
         default_action = multithread_action_wrapper()
-        default_action.run()
+        default_action.start()
 
     # If patient is not speaking now, we think of replies.
     else:
