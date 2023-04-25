@@ -43,7 +43,7 @@ def main_loop():
     # logger.info("enter main loop")
 
     global emergency_stop_flag
-    global speaking_state
+    global user_speaking
     global robot_speaking
     # global em
     # global logger
@@ -53,13 +53,11 @@ def main_loop():
     ## Check if Grace is speaking, then don't do anything except for tracking engagement level
     engagement_state = em.update_engagement_level()
 
-    if( not speaking_state) :
-        speaking_state = not time_window.check_asr_input()
+    user_speaking = time_window.check_asr_input()
 
 
 
-    # If patient is speaking, we only run emotion and vision analysis. We will wait for chatbot to generate a reply.
-    logger.info(f"engagnement={engagement_state}, user_speaking={speaking_state}, robot_speaking={robot_speaking}")
+    logger.info(f"engagnement={engagement_state}, user_speaking={user_speaking}, robot_speaking={robot_speaking}")
 
     # print(engagement_state)
     if robot_speaking:
@@ -73,7 +71,8 @@ def main_loop():
             # exit(0) # to be replaced by Gracefully end.
             return
 
-    if speaking_state:
+    # If patient is speaking, we only run emotion and vision analysis. We will wait for chatbot to generate a reply.
+    if user_speaking:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
             logger.debug("Currently Agitated. Patient is agitated when he is speaking")
@@ -83,6 +82,12 @@ def main_loop():
             # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
             return
         
+        # wait_user_till_he_stop
+        wait = True
+        while wait:
+            wait, user_input = asr_listener.get_full_sentence()
+            time.sleep(0.2)
+
         # TODO: An await function to wait for chatbot reply.
         # await for asr_listener
         #time.sleep(2)
@@ -93,6 +98,7 @@ def main_loop():
 
         default_action = multithread_action_wrapper()
         default_action.start()
+
 
     # If patient is not speaking now, we think of replies.
     else:
@@ -168,7 +174,7 @@ if __name__ == "__main__":
     # start_command.listen()
 
     #Speaking state var
-    speaking_state = False
+    user_speaking = False
 
     # Whether Grace is speaking
     robot_speaking = False

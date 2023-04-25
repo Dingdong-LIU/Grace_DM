@@ -58,6 +58,8 @@ class ASR_Full_Sentence:
         }
         self.logger = logger
 
+        self.new_sentence = False
+
     def ros_dynamic_configuration(self, lang="HK"):
         """Dynamic configuration of ASR language settings, 
         choose between Cantonese yue-Hant-HK and English en-GB"""
@@ -72,7 +74,7 @@ class ASR_Full_Sentence:
 
     def ASR_sentence_callback(self, msg):
         # Update the asr message storage
-        self.asr_full_sentence = msg.utterance
+        self.asr_full_sentence = msg.utterance.data
         self.sentence_format["lang"] = msg.lang
         self.sentence_format["confidence"] = msg.confidence
         self.sentence_format["source"] = msg.source
@@ -80,7 +82,14 @@ class ASR_Full_Sentence:
 
         
         self.logger.info(f"Send {self.asr_full_sentence} to chatbot")
+        self.new_sentence = True
         # TODO: invoke the Dialogue manager
         # send the message to some port XXX?
+
+    def get_full_sentence(self):
+        if self.new_sentence:
+            return (True, self.asr_full_sentence)
+        else:
+            return (False, self.asr_full_sentence)
 
 
