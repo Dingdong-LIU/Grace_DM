@@ -16,6 +16,19 @@ import time
 from utils.robot_trigger import action_trigger
 from utils.emotion_recognition_handler import Emotion_Recognition_Handeler
 
+from threading import Thread
+
+class multithread_action_wrapper(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+    
+    def run(self):
+        global robot_speaking
+        logger.info("Start to pass actions to robot")
+        robot_speaking = True
+        robot_connector.test_send_request()
+        robot_speaking = False
+
 
 def main_loop():
     """ This is one loop happens in the main frame.
@@ -66,9 +79,11 @@ def main_loop():
         # await for asr_listener
         time.sleep(2)
         # TEST:
-        robot_speaking = True
-        exe_state = robot_connector.test_send_request()
-        robot_speaking = False
+        # robot_speaking = True
+        # exe_state = robot_connector.test_send_request()
+        # robot_speaking = False
+        default_action = multithread_action_wrapper()
+        default_action.run()
 
     # If patient is not speaking now, we think of replies.
     else:
