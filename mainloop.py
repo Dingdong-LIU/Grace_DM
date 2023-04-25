@@ -54,6 +54,7 @@ def main_loop():
     engagement_state = em.update_engagement_level()
 
     user_speaking = time_window.check_asr_input()
+    # receive word --> speaking; receive sentence --> not speaking
 
 
 
@@ -69,7 +70,8 @@ def main_loop():
             # 1. Pass an emergency stop to Grace. 
             # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
             # exit(0) # to be replaced by Gracefully end.
-
+            return
+        return
 
         return
 

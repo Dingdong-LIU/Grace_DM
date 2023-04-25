@@ -93,6 +93,6 @@ class ASR_Full_Sentence:
             return (wait, self.asr_full_sentence)
         else:
             wait = True
-            return (True, self.asr_full_sentence)
+            return (wait, self.asr_full_sentence)
 
 

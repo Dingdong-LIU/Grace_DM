@@ -23,6 +23,7 @@ class action_trigger:
     def open_database(self):
         return 
     def test_send_request(self):
+        print("start to wait for service to finish")
         req = grace_attn_msgs.srv.GraceBehaviorRequest()
         req.command = 'exec'
         req.utterance = self.grace_api_configs['Debug']['Sample']['txt']
