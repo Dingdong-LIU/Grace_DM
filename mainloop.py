@@ -95,6 +95,7 @@ def main_loop():
             # 2. emergency stop
             emergency_stop_flag = True
             return
+    logger.info(f"engagnement={engagement_state}, speaking_state={speaking_state}")
 
         
         
