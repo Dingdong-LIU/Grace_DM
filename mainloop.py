@@ -43,6 +43,7 @@ def main_loop():
     # logger.info("enter main loop")
 
     global emergency_stop_flag
+    global speaking_state
     global robot_speaking
     # global em
     # global logger
@@ -52,7 +53,11 @@ def main_loop():
     ## Check if Grace is speaking, then don't do anything except for tracking engagement level
     engagement_state = em.update_engagement_level()
 
-    speaking_state = time_window.check_asr_input()
+    if( not speaking_state) :
+        speaking_state = not time_window.check_asr_input()
+
+
+
     # If patient is speaking, we only run emotion and vision analysis. We will wait for chatbot to generate a reply.
     logger.info(f"engagnement={engagement_state}, user_speaking={speaking_state}, robot_speaking={robot_speaking}")
 
@@ -80,11 +85,12 @@ def main_loop():
         
         # TODO: An await function to wait for chatbot reply.
         # await for asr_listener
-        time.sleep(2)
+        #time.sleep(2)
         # TEST:
         # robot_speaking = True
         # exe_state = robot_connector.test_send_request()
         # robot_speaking = False
+
         default_action = multithread_action_wrapper()
         default_action.start()
 
@@ -104,7 +110,7 @@ def main_loop():
             # TODO: ask chatbot to repeat the question once
             # 1. send an artificial message to chatbot: "Can you repeat?"
             # 2. await for chatbot's response
-            time.sleep(2)
+            #time.sleep(2)
             return
         if engagement_state == "Agitated":
             logger.info("Patient didn't answer and is agitated, ask robot to gracefully stop at once")
@@ -160,6 +166,9 @@ if __name__ == "__main__":
 
     #Yifan note: no need to actively call the listener
     # start_command.listen()
+
+    #Speaking state var
+    speaking_state = False
 
     # Whether Grace is speaking
     robot_speaking = False
