@@ -83,11 +83,10 @@ def main_loop():
             # only handle "Agitated" when patient is speaking
             # FINISH: Do something
             # Stop the orientation
-            # 1. Pass an emergency stop to Grace. 
-            # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
+            # 1. Pass an emergency stop to Grace. This will Stop the robot when robot finishes speaking. Set a stoping flag
             # exit(0) # to be replaced by Gracefully end.
             # gracefully_end(f"Agitation detected during robot talking, need to end conversation now.\nengagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
-            logger.error("Agitation detected during robot talking, need to end conversation now")
+            logger.error("Agitation detected during robot talking, need to end conversation when robot finishes")
             emergency_stop_flag = True
             return
         return
