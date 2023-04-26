@@ -198,20 +198,8 @@ if __name__ == "__main__":
 
     # make sure that ctrl-c can work
     while not rospy.is_shutdown():
+        # TODO:trigger the greeting
         main_loop()
         rate.sleep()#Will make sure this loop runs at 30Hz
 
 
-
-    # ###Start Button callback from GUI###
-    # start = False
-    # while args.start_button == True: # if a start button is implemented
-    #     pass
-    #     if start == True:
-    #         break
-
-    # ### Start ASR module to listen for full sentence
-    # asr_handler = ASR_Full_Sentence()
-    # asr_handler.listen()
-
-    # main_loop(asr_handler)
