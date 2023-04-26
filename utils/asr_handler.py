@@ -89,8 +89,12 @@ class ASR_Full_Sentence:
         self.sentence_format["source"] = msg.source
         self.sentence_format["audio_path"] = msg.audio_path
 
-        
-        self.logger.info(f"Send {self.asr_full_sentence} to chatbot")
+        #Yifan mod: edited the log text
+        # self.logger.info(f"Send {self.asr_full_sentence} to chatbot")
+        self.logger.info(f"Obtained sentence ({self.asr_full_sentence}) from ASR")
+
+
+
         self.new_sentence = True
         self.timestamp = time.time()
         # TODO: invoke the Dialogue manager?

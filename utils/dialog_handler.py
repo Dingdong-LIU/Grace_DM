@@ -12,7 +12,7 @@ class DIALOG_HANDLR:
         print(self.session_id)
 
     def communicate(self, asr_text):
-        self.logger.debug("Start to communicate with chatbot")
+        self.logger.debug("Start to communicate with chatbot: %s" % asr_text)
         response = requests.post(
             f"{NGROK_LINK}/dialogflow_result",
             json={
@@ -20,5 +20,5 @@ class DIALOG_HANDLR:
                 "session_id": self.session_id
             }
         )
-        self.logger.debug("Received replies from chatbot")
+        self.logger.debug("Received replies from chatbot due to %s" % asr_text)
         return response.json()
