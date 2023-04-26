@@ -270,6 +270,7 @@ if __name__ == "__main__":
     utterance, params = robot_connector.parse_reply_from_chatbot(res=res)
     req = robot_connector.compose_req(command='exec', utterance=utterance, params=params)
     robot_connector.send_request(req)
+    performance_end_timestamp = time.time()
 
     # make sure that ctrl-c can work
     while not rospy.is_shutdown():
