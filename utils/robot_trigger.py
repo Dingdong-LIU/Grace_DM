@@ -13,6 +13,7 @@ import logging
 
 class action_trigger:
     def __init__(self) -> None:
+        self.logger = logging.getLogger()
         self.grace_api_configs = self.loadConfigs()
         #Ros routine
         #self.node = rospy.init_node("exec_test")
@@ -20,7 +21,6 @@ class action_trigger:
         self.grace_behavior_client = rospy.ServiceProxy(self.grace_api_configs['Ros']['grace_behavior_service'], grace_attn_msgs.srv.GraceBehavior)
 
         self.req = grace_attn_msgs.srv.GraceBehaviorRequest()
-        self.logger = logging.getLogger()
 
     def open_database(self):
         return 
