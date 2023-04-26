@@ -113,14 +113,14 @@ def main_loop():
         
         # Patient don't answer with in time_window in if-else branch
         # Check engagement level
-        if engagement_state == "Distracted":
+        elif engagement_state == "Distracted":
             logger.info("No feedback from patients and patient is distracted, asking robot to repeat")
             # TODO: ask chatbot to repeat the question once
             # 1. send an artificial message to chatbot: "Can you repeat?"
             # 2. await for chatbot's response
             #time.sleep(2)
             return
-        if engagement_state == "Agitated":
+        elif engagement_state == "Agitated":
             logger.info("Patient didn't answer and is agitated, ask robot to gracefully stop at once")
             # TODO: ask chatbot to repeat the question once
             # 1. send an artificial message to chatbot: "I don't want to talk anymore"
