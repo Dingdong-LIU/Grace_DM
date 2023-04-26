@@ -196,7 +196,7 @@ def main_loop():
             return
         elif engagement_state == "Engaged":
             if time.time() - performance_end_timestamp > stare_but_not_talk_timeout:
-                gracefully_end(error_message="Patient didn't answer and is agitated, ask robot to gracefully stop at once.")
+                gracefully_end(error_message="Stare too long at Grace.")
     else:
         logger.error(f"user speaking state not in 0,1,2,3, is {user_speaking_state}")
         sys.exit(-1)

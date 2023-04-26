@@ -95,7 +95,9 @@ class engagement_estimator:
         engagement_level = "NOT_STABLE"
         emotion = self.emotion_module.get_signal_state("emotion")
         attention = self.emotion_module.get_signal_state("attention")
-        if emotion in ["Anger", "Agitation"]:
+        #Ugly fix for agitation
+        # if emotion in ["Anger", "Agitation"]:
+        if emotion in ["NONEXISTENT"]:
             engagement_level = "Agitated"
         elif attention == "False":
             engagement_level = "Distracted"
