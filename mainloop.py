@@ -65,6 +65,7 @@ def main_loop():
     global robot_speaking
     global hardware_interrupt
     global performance_end_timestamp
+    global time_repeat
 
     # Get patient's engagement level
     engagement_state = em.update_engagement_level()
@@ -148,6 +149,9 @@ def main_loop():
         multithread_action = multithread_action_wrapper()
         multithread_action.run(robot_connector.send_request, req)
 
+        # repeat counter
+        time_repeat = 0
+
 
 
     # If patient is not speaking now, we think of re-engages. This state patient generally don't reply.
@@ -176,7 +180,10 @@ def main_loop():
             # - args.magic_string["repeat"]
             # 2. await for chatbot's response
             #time.sleep(2)
+            time_repeat += 1
             ask_for_repeat(error_message="No feedback from patients and patient is distracted, asking robot to repeat")
+            if time_repeat > 1:
+                grace_attn_msgs(error_message="Repeated but patient don't get engaged: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
             return
         elif engagement_state == "Agitated":
             # logger.info("Patient didn't answer and is agitated, ask robot to gracefully stop at once")
@@ -187,6 +194,9 @@ def main_loop():
             # emergency_stop_flag = True
             gracefully_end(error_message="Patient didn't answer and is agitated, ask robot to gracefully stop at once. current_state: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
             return
+        elif engagement_state == "Engaged":
+            if time.time() - performance_end_timestamp < stare_but_not_talk_timeout:
+                gracefully_end(error_message="Patient didn't answer and is agitated, ask robot to gracefully stop at once.")
     else:
         logger.error(f"user speaking state not in 0,1,2,3, is {user_speaking_state}")
         sys.exit(-1)
@@ -248,6 +258,8 @@ if __name__ == "__main__":
     # timestamp of finishing performance
     performance_end_timestamp = 0
     distraction_time = 2 # in seconds
+    stare_but_not_talk_timeout = 3 # in seconds
+    time_repeat = 0
 
     #Yifan note: put an infinite loop here just for testing
     rate = rospy.Rate(10)#30hz
