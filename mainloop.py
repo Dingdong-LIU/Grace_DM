@@ -256,7 +256,8 @@ if __name__ == "__main__":
     # TODO:trigger the greeting
     res = chatbot.communicate(args.magic_string["start_conversation"])
     utterance, params = robot_connector.parse_reply_from_chatbot(res=res)
-    req = robot_connector.compose_req(command='exec', utterance=utterance, params=params)
+    req = robot_connector.compose_req(command='exec', utterance='utterance', params=params)
+    req.lang = 'en-US'
     robot_connector.send_request(req)
 
     # make sure that ctrl-c can work

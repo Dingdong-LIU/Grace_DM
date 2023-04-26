@@ -25,7 +25,7 @@ class action_trigger:
         # datareader for performance config
         self.database_reader = database_reader(filename="/home/grace_team/HKUST_GRACE/Grace_Project/Grace_DM/data/intent_emotion_mapping.xlsx")
     
-    def parse_reply_from_chatbot(self, res:dict) -> tuple[str, dict]:
+    def parse_reply_from_chatbot(self, res:dict):
         intent = res["responses"]['intent']
         utterance = res["responses"]['text']
         params = self.database_reader.lookup_table(intent_name=intent)
