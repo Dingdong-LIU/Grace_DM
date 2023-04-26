@@ -53,7 +53,7 @@ def main_loop():
     ## Check if Grace is speaking, then don't do anything except for tracking engagement level
     engagement_state = em.update_engagement_level()
 
-    user_speaking_state = timeout.check_asr_input()
+    user_speaking_state = time_window.check_asr_input()
     # receive word --> speaking; receive sentence --> not speaking
 
 
@@ -95,8 +95,8 @@ def main_loop():
         logger.info("At this time user is speaking, need wait (do nothing) till he finish")
     # When ASR receives a full sentence, and decided to send it to chat bot
     elif user_speaking_state == 3:
-
-        logger.info("User stoped speaking as word stream input timeout. Start to trigger chatbot.")
+        sentence_heard = time_window.get_cached_sentences()
+        logger.info(f"User stoped speaking as word stream input timeout. Start to trigger chatbot. \nSentence heard: {sentence_heard}")
 
         default_action = multithread_action_wrapper()
         default_action.start()
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     emotion_listener = Emotion_Recognition_Handeler(args)
 
     # time_window
-    timeout = time_window_manager(args, time_window=0.5)
+    time_window = time_window_manager(args, time_window=0.5)
 
     # engagement estimator
     em = engagement_estimator(emotion_listener)
