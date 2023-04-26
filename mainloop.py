@@ -130,7 +130,7 @@ def main_loop():
             # 1. Stop the chatbot when patient finish speaking. Set a stoping flag
             emergency_stop_flag = True
             return
-        logger.info("At this time user is speaking, need wait (do nothing) till he finish")
+        logger.debug("At this time user is speaking, need wait (do nothing) till he finish")
     # When ASR receives a full sentence, and decided to send it to chat bot
     elif user_speaking_state == 3:
         sentence_heard = time_window.get_cached_sentences()
