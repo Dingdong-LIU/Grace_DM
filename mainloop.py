@@ -15,7 +15,8 @@ from utils.mainloop_manager import time_window_manager, engagement_estimator
 import time
 from utils.robot_trigger import action_trigger
 from utils.emotion_recognition_handler import Emotion_Recognition_Handeler
-from utils.data_reader import database_reader
+# from utils.data_reader import database_reader
+from utils.dialog_handler import DIALOG_HANDLR
 
 from threading import Thread
 
@@ -23,19 +24,32 @@ class multithread_action_wrapper(Thread):
     def __init__(self):
         Thread.__init__(self)
     
-    def run(self):
+    def run(self, function_template):
         global robot_speaking
         global logger
         global hardware_interrupt
         global performance_end_timestamp
         logger.info("Start to pass actions to robot")
         robot_speaking = True
-        execution_result = robot_connector.test_send_request()
+        execution_result = function_template()
         logger.info("Execution result %s" % execution_result)
         hardware_interrupt = (execution_result == "interrupted")
         robot_speaking = False
         performance_end_timestamp = time.time()
 
+def ask_for_repeat(error_message):
+    res = chatbot.communicate(args.magic_string["repeat"])
+    utterance, params = robot_connector.parse_reply_from_chatbot(res=res)
+    req = robot_connector.compose_req(command='exec', utterance=utterance, params=params)
+    logger.error(f"Repeat due to {error_message}")
+    robot_connector.send_request(req)
+
+def gracefully_end(error_message):
+    res = chatbot.communicate(args.magic_string["gracefully_end_conversation"])
+    utterance, params = robot_connector.parse_reply_from_chatbot(res=res)
+    req = robot_connector.compose_req(command='exec', utterance=utterance, params=params)
+    robot_connector.send_request(req)
+    robot_connector.stop_conversation(error_message=error_message)
 
 def main_loop():
     """ This is one loop happens in the main frame.
@@ -67,19 +81,41 @@ def main_loop():
     if robot_speaking:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
-            logger.info("Agitation detected during robot talking, need to end conversation now")
-            # TODO: Do something
+            # FINISH: Do something
             # Stop the orientation
             # 1. Pass an emergency stop to Grace. 
             # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
             # exit(0) # to be replaced by Gracefully end.
+            # gracefully_end(f"Agitation detected during robot talking, need to end conversation now.\nengagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
+            logger.error("Agitation detected during robot talking, need to end conversation now")
+            emergency_stop_flag = True
             return
         return
 
     if hardware_interrupt:
         logger.info("Hardware Bardging in detected")
-        # TODO: Handle hardware interruption
+        # IMPORTANT
+        # FINISH: Handle hardware interruption
         # After handling hardware interruption
+
+        # The same way as state==3
+        # ==============
+        sentence_heard = time_window.get_cached_sentences()
+        logger.info(f"User interrupt via Hardware. Now handle user input. Sentence heard: {sentence_heard}")
+
+        # FINISH: communicate with chatbot to get a response sentence
+        # default_action = multithread_action_wrapper()
+        # default_action.start()
+        res = chatbot.communicate(sentence_heard)
+        utterance, params = robot_connector.parse_reply_from_chatbot(res=res)
+        req = robot_connector.compose_req(command='exec', utterance=utterance, params=params)
+        # robot_connector.send_request(req) # single thread response
+
+        # multithread performance trigger
+        multithread_action = multithread_action_wrapper()
+        multithread_action.run(robot_connector.send_request(req))
+        # ===============
+
         hardware_interrupt = False
         return 
 
@@ -89,11 +125,11 @@ def main_loop():
     if user_speaking_state == 1 or user_speaking_state == 2:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
-            logger.info("Currently Agitated. Patient is agitated when he is speaking")
-            # TODO: Do something
+            # logger.info("Currently Agitated. Patient is agitated when he is speaking")
+            # FINISH:
             # Stop the orientation
-            # 1. Pass an emergency stop to Grace. 
-            # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
+            # 1. Stop the chatbot when patient finish speaking. Set a stoping flag
+            emergency_stop_flag = True
             return
         logger.info("At this time user is speaking, need wait (do nothing) till he finish")
     # When ASR receives a full sentence, and decided to send it to chat bot
@@ -101,9 +137,18 @@ def main_loop():
         sentence_heard = time_window.get_cached_sentences()
         logger.info(f"User stoped speaking as word stream input timeout. Start to trigger chatbot. \nSentence heard: {sentence_heard}")
 
-        # TODO: communicate with chatbot to get a response sentence
-        default_action = multithread_action_wrapper()
-        default_action.start()
+        # FINISH: communicate with chatbot to get a response sentence
+        # default_action = multithread_action_wrapper()
+        # default_action.start()
+        res = chatbot.communicate(sentence_heard)
+        utterance, params = robot_connector.parse_reply_from_chatbot(res=res)
+        req = robot_connector.compose_req(command='exec', utterance=utterance, params=params)
+        # robot_connector.send_request(req) # single thread response
+
+        # multithread performance trigger
+        multithread_action = multithread_action_wrapper()
+        multithread_action.run(robot_connector.send_request(req))
+
 
 
     # If patient is not speaking now, we think of re-engages. This state patient generally don't reply.
@@ -117,26 +162,31 @@ def main_loop():
 
         # Handle the emergency stop when patient stop speaking
         if emergency_stop_flag:
-            logger.info("Emergency stop due to agitation")
-            # TODO: gracefully stop the robot. here I only log the message
+            # logger.info("Emergency stop due to agitation")
+            # FINISH: gracefully stop the robot. here I only log the message
             # currently I write a return here, though it won't actually stop the loop
+            gracefully_end(f"Emergency stop due to agitation when he or she is talking (by flag), current_state: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
             return
         
         # Patient don't answer with in time_window in if-else branch
         # Check engagement level
         elif engagement_state == "Distracted":
-            logger.info("No feedback from patients and patient is distracted, asking robot to repeat")
-            # TODO: ask chatbot to repeat the question once
-            # 1. send an artificial message to chatbot: "Can you repeat?"
+            # logger.info("No feedback from patients and patient is distracted, asking robot to repeat")
+            # FINISH: ask chatbot to repeat the question once
+            # 1. send an artificial message to chatbot: "Can you repeat?" 
+            # - args.magic_string["repeat"]
             # 2. await for chatbot's response
             #time.sleep(2)
+            ask_for_repeat(error_message="No feedback from patients and patient is distracted, asking robot to repeat")
             return
         elif engagement_state == "Agitated":
-            logger.info("Patient didn't answer and is agitated, ask robot to gracefully stop at once")
-            # TODO: ask chatbot to repeat the question once
-            # 1. send an artificial message to chatbot: "I don't want to talk anymore"
+            # logger.info("Patient didn't answer and is agitated, ask robot to gracefully stop at once")
+            # FINISH: ask chatbot to gracefully end
+            # 1. send an artificial message to chatbot: "I don't want to talk anymore" 
+            #  - args.magic_string["gracefully_end_conversation"]
             # 2. emergency stop
-            emergency_stop_flag = True
+            # emergency_stop_flag = True
+            gracefully_end(error_message="Patient didn't answer and is agitated, ask robot to gracefully stop at once. current_state: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
             return
     else:
         logger.error(f"user speaking state not in 0,1,2,3, is {user_speaking_state}")
@@ -178,8 +228,8 @@ if __name__ == "__main__":
     # engagement estimator
     em = engagement_estimator(emotion_listener)
 
-    # datareader for performance configs
-    database_reader = database_reader(filename="/home/grace_team/HKUST_GRACE/Grace_Project/Grace_DM/data/intent_emotion_mapping.xlsx")
+    # initialize the chatbot
+    chatbot = DIALOG_HANDLR()
 
     # Connector to robot
     try:
@@ -187,10 +237,6 @@ if __name__ == "__main__":
     except rospy.exceptions.ROSException as e:
         logger.error("Fail to connect to robot's custom action service \n" + str(e))
         sys.exit(0) # comment this line if want to start mainloop without custom action APIs
-
-
-    #Yifan note: no need to actively call the listener
-    # start_command.listen()
 
     #Speaking state var
     user_speaking_state = False
@@ -207,9 +253,15 @@ if __name__ == "__main__":
     #Yifan note: put an infinite loop here just for testing
     rate = rospy.Rate(10)#30hz
 
+    # Trigger the initial greetings
+    # TODO:trigger the greeting
+    res = chatbot.communicate(args.magic_string["start_conversation"])
+    utterance, params = robot_connector.parse_reply_from_chatbot(res=res)
+    req = robot_connector.compose_req(command='exec', utterance=utterance, params=params)
+    robot_connector.send_request(req)
+
     # make sure that ctrl-c can work
     while not rospy.is_shutdown():
-        # TODO:trigger the greeting
         main_loop()
         rate.sleep()#Will make sure this loop runs at 30Hz
 

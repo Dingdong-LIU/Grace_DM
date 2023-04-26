@@ -5,7 +5,7 @@ class database_reader():
         super().__init__()
         self.df = pd.read_excel(filename)
     
-    def lookup_table(self, df:pd.DataFrame, intent_name:str):
+    def lookup_table(self, intent_name:str):
         df_line = self.df[self.df["Intent Name"] == intent_name]
         lookup_result = {}
 

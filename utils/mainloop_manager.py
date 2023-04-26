@@ -98,5 +98,3 @@ class engagement_estimator:
         if self.emotion_module.get_signal_state("emotion") in ["Anger", "Agitation"]:
             engagement_level = "Agitated"
         return engagement_level
-    
-

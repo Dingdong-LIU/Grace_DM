@@ -9,7 +9,7 @@ import hr_msgs.cfg
 import hr_msgs.srv
 import std_msgs
 import logging
-
+from utils.data_reader import database_reader
 
 class action_trigger:
     def __init__(self, lang='yue-Hant-HK') -> None:
@@ -22,6 +22,15 @@ class action_trigger:
         self.lang = lang
 
         self.req = grace_attn_msgs.srv.GraceBehaviorRequest()
+        # datareader for performance config
+        self.database_reader = database_reader(filename="/home/grace_team/HKUST_GRACE/Grace_Project/Grace_DM/data/intent_emotion_mapping.xlsx")
+    
+    def parse_reply_from_chatbot(self, res:dict) -> tuple[str, dict]:
+        intent = res["responses"]['intent']
+        utterance = res["responses"]['text']
+        params = self.database_reader.lookup_table(intent_name=intent)
+        return (utterance, params)
+    
 
     def compose_req(self, command:str, utterance:str, params:dict) -> grace_attn_msgs.srv.GraceBehaviorRequest:
         """Compose a string using params and command
@@ -87,9 +96,11 @@ class action_trigger:
             self.logger.info("Read successful")
         return grace_api_configs
     
-    def loopup_sentence_configs(self, sentence:str) -> grace_attn_msgs.srv.GraceBehaviorRequest:
-
-        return self.req
+    def stop_conversation(self, error_message:str):
+        req = grace_attn_msgs.srv.GraceBehaviorRequest()
+        req.command = 'stop'
+        self.grace_behavior_client(req)
+        self.logger.error(f"Emergency Stop because {error_message}")
 
 
 
