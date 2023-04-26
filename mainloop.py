@@ -72,8 +72,8 @@ def main_loop():
             # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
             # exit(0) # to be replaced by Gracefully end.
             return
-        if user_speaking_state == 1 or 2:
-            logger.info("Bardging in detected via software")
+        # if user_speaking_state == 1 or 2:
+        #     logger.info("Bardging in detected via software")
         return
 
     if hardware_interrupt:

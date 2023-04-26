@@ -5,6 +5,7 @@
   - [Module Specifications](#module-specifications)
     - [Chatbot Dialogue Manager (CDM)](#chatbot-dialogue-manager-cdm)
       - [Communication Protocals](#communication-protocals)
+      - [magic start](#magic-start)
         - [Data Formats](#data-formats)
       - [Interaction Details](#interaction-details)
     - [Grace APIs](#grace-apis)
@@ -23,6 +24,16 @@ This is the repo for Grace's Dialogue manager, basically consists of one `mainlo
 This part is contributed by Yejin and Willy. Basically in the `mainloop`, we need to input a sentence into the chatbot dialogue manager, and receive the output from the chatbot dialogue manager. The protocals needs to be specified.
 
 #### Communication Protocals
+
+#### magic start
+```text
+This is a magic phrase to initialize grace agent to welcome intent.
+```
+
+
+```
+random input to repeat
+```
 
 ##### Data Formats
 
