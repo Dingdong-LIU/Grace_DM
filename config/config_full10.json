@@ -19,5 +19,10 @@
         "toggle_nodding_topic": "/grace_proj/toggle_nodding_topic",
         "dialogue_log_topic": "/grace_proj/dialogue_log_topic"
     },
-    "topic_queue_size": 100
+    "topic_queue_size": 100,
+    "magic_string": {
+        "start_conversation" : "This is a magic phrase to initialize grace agent to welcome intent.",
+        "gracefully_end_conversation" : "gracefully exit the interaction.",
+        "repeat" : "please repeat"
+    }
 }
