@@ -90,11 +90,22 @@ class engagement_estimator:
             asr_module (Emotion_Recognition_Handeler): The emotional subscriber listening to emotion message.
 
         Returns:
-            str: Either "Engaged", "Distracted" or "Agitated"
+            str: Either "Engaged", "Distracted" or "Agitated" or "NOT_STABLE". NOT_STABLE means input from emotion or attention is empty
         """
-        engagement_level = "Engaged"
-        if self.emotion_module.get_signal_state("attention") == "False":
-            engagement_level = "Distracted"
-        if self.emotion_module.get_signal_state("emotion") in ["Anger", "Agitation"]:
+        engagement_level = "NOT_STABLE"
+        emotion = self.emotion_module.get_signal_state("emotion")
+        attention = self.emotion_module.get_signal_state("attention")
+        if emotion in ["Anger", "Agitation"]:
             engagement_level = "Agitated"
+        elif attention == "False":
+            engagement_level = "Distracted"
+        elif emotion in ["Abscence", "EXCEPTION!!"]:
+            engagement_level = "Distracted"
+        elif emotion == "" or attention == "":
+            engagement_level = "NOT_STABLE"
+        else:
+            engagement_level = "Engaged"
+        
         return engagement_level
+    
+        # engagement_level = 
