@@ -15,6 +15,7 @@ from utils.mainloop_manager import time_window_manager, engagement_estimator
 import time
 from utils.robot_trigger import action_trigger
 from utils.emotion_recognition_handler import Emotion_Recognition_Handeler
+from utils.data_reader import database_reader
 
 from threading import Thread
 
@@ -26,12 +27,14 @@ class multithread_action_wrapper(Thread):
         global robot_speaking
         global logger
         global hardware_interrupt
+        global performance_end_timestamp
         logger.info("Start to pass actions to robot")
         robot_speaking = True
         execution_result = robot_connector.test_send_request()
         logger.info("Execution result %s" % execution_result)
         hardware_interrupt = (execution_result == "interrupted")
         robot_speaking = False
+        performance_end_timestamp = time.time()
 
 
 def main_loop():
@@ -49,6 +52,7 @@ def main_loop():
     global user_speaking_state
     global robot_speaking
     global hardware_interrupt
+    global performance_end_timestamp
 
 
     ## Check if Grace is speaking, then don't do anything except for tracking engagement level
@@ -109,6 +113,13 @@ def main_loop():
 
     # If patient is not speaking now, we think of re-engages. This state patient generally don't reply.
     elif user_speaking_state == 0:
+
+        # If input from user for less than 2 seconds, ignore
+        # otherwise treat as distraction
+        if time.time() - performance_end_timestamp < distraction_time:
+            return
+
+
         # Handle the emergency stop when patient stop speaking
         if emergency_stop_flag:
             logger.info("Emergency stop due to agitation")
@@ -172,6 +183,9 @@ if __name__ == "__main__":
     # engagement estimator
     em = engagement_estimator(emotion_listener)
 
+    # datareader for performance configs
+    database_reader = database_reader(filename="/home/grace_team/HKUST_GRACE/Grace_Project/Grace_DM/data/intent_emotion_mapping.xlsx")
+
     # Connector to robot
     try:
         robot_connector = action_trigger()
@@ -185,13 +199,15 @@ if __name__ == "__main__":
 
     #Speaking state var
     user_speaking_state = False
-
     # Whether Grace is speaking
     robot_speaking = False
     # Whether to have emergency stop
     emergency_stop_flag = False
     # whether robot is interrupted
     hardware_interrupt = False
+    # timestamp of finishing performance
+    performance_end_timestamp = 0
+    distraction_time = 2 # in seconds
 
     #Yifan note: put an infinite loop here just for testing
     rate = rospy.Rate(10)#30hz
