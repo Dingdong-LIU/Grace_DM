@@ -68,8 +68,9 @@ class time_window_manager:
         return self.state
 
     def get_cached_sentences(self):
+        sentence = " ".join(self.heard_sentences)
         self.heard_sentences = []
-        return " ".join(self.heard_sentences)
+        return sentence
 
 
 class engagement_estimator:
