@@ -6,7 +6,7 @@ import os
 def setup_logger():
     timestr = time.strftime("%Y%m%d-%H%M%S")
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s.%(msecs)03d | %(levelname)s | %(message)s','%m-%d-%Y %H:%M:%S')
     stdout_handler = logging.StreamHandler(sys.stdout)
     stdout_handler.setLevel(logging.DEBUG)
