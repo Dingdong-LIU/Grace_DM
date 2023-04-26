@@ -29,6 +29,7 @@ class multithread_action_wrapper(Thread):
         logger.info("Start to pass actions to robot")
         robot_speaking = True
         execution_result = robot_connector.test_send_request()
+        logger.info("Execution result %s" % execution_result)
         hardware_interrupt = (execution_result == "interrupted")
         robot_speaking = False
 
@@ -76,7 +77,7 @@ def main_loop():
         return
 
     if hardware_interrupt:
-        logger.debug("Hardware Bardging in detected")
+        print("Hardware Bardging in detected")
         return 
 
     
