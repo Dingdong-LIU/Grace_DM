@@ -64,7 +64,7 @@ def main_loop():
     global user_speaking_state
     global robot_speaking
     global hardware_interrupt
-    global performance_end_timestamp
+    # global performance_end_timestamp
     global time_repeat
 
     # Get patient's engagement level
@@ -195,7 +195,7 @@ def main_loop():
             gracefully_end(error_message="Patient didn't answer and is agitated, ask robot to gracefully stop at once. current_state: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
             return
         elif engagement_state == "Engaged":
-            if time.time() - performance_end_timestamp < stare_but_not_talk_timeout:
+            if time.time() - performance_end_timestamp > stare_but_not_talk_timeout:
                 gracefully_end(error_message="Patient didn't answer and is agitated, ask robot to gracefully stop at once.")
     else:
         logger.error(f"user speaking state not in 0,1,2,3, is {user_speaking_state}")
