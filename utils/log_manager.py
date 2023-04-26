@@ -6,7 +6,7 @@ import os
 def setup_logger():
     timestr = time.strftime("%Y%m%d-%H%M%S")
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s',
                                   '%m-%d-%Y %H:%M:%S')
 

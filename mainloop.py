@@ -65,7 +65,7 @@ def main_loop():
     if robot_speaking:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
-            logger.debug("Agitation detected during robot talking, need to end conversation now")
+            logger.info("Agitation detected during robot talking, need to end conversation now")
             # TODO: Do something
             # Stop the orientation
             # 1. Pass an emergency stop to Grace. 
@@ -73,11 +73,14 @@ def main_loop():
             # exit(0) # to be replaced by Gracefully end.
             return
         if user_speaking_state == 1 or 2:
-            logger.debug("Bardging in detected via software")
+            logger.info("Bardging in detected via software")
         return
 
     if hardware_interrupt:
-        print("Hardware Bardging in detected")
+        logger.info("Hardware Bardging in detected")
+
+        # After handling hardware interruption
+        hardware_interrupt = False
         return 
 
     
@@ -87,7 +90,7 @@ def main_loop():
     if user_speaking_state == 1 or user_speaking_state == 2:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
-            logger.debug("Currently Agitated. Patient is agitated when he is speaking")
+            logger.info("Currently Agitated. Patient is agitated when he is speaking")
             # TODO: Do something
             # Stop the orientation
             # 1. Pass an emergency stop to Grace. 
@@ -107,7 +110,7 @@ def main_loop():
     elif user_speaking_state == 0:
         # Handle the emergency stop when patient stop speaking
         if emergency_stop_flag:
-            logger.debug("Emergency stop due to agitation")
+            logger.info("Emergency stop due to agitation")
             # TODO: gracefully stop the robot. here I only log the message
             # currently I write a return here, though it won't actually stop the loop
             return
