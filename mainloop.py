@@ -24,14 +24,14 @@ class multithread_action_wrapper(Thread):
     def __init__(self):
         Thread.__init__(self)
     
-    def run(self, function_template):
+    def run(self, function_template, req):
         global robot_speaking
         global logger
         global hardware_interrupt
         global performance_end_timestamp
         logger.info("Start to pass actions to robot")
         robot_speaking = True
-        execution_result = function_template()
+        execution_result = function_template(req)
         logger.info("Execution result %s" % execution_result)
         hardware_interrupt = (execution_result == "interrupted")
         robot_speaking = False
@@ -112,7 +112,7 @@ def main_loop():
 
         # multithread performance trigger
         multithread_action = multithread_action_wrapper()
-        multithread_action.run(robot_connector.send_request(req))
+        multithread_action.run(robot_connector.send_request, req)
         # ===============
 
         hardware_interrupt = False
@@ -146,7 +146,7 @@ def main_loop():
 
         # multithread performance trigger
         multithread_action = multithread_action_wrapper()
-        multithread_action.run(robot_connector.send_request(req))
+        multithread_action.run(robot_connector.send_request, req)
 
 
 
@@ -256,8 +256,7 @@ if __name__ == "__main__":
     # TODO:trigger the greeting
     res = chatbot.communicate(args.magic_string["start_conversation"])
     utterance, params = robot_connector.parse_reply_from_chatbot(res=res)
-    req = robot_connector.compose_req(command='exec', utterance='utterance', params=params)
-    req.lang = 'en-US'
+    req = robot_connector.compose_req(command='exec', utterance=utterance, params=params)
     robot_connector.send_request(req)
 
     # make sure that ctrl-c can work
