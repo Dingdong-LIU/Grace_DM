@@ -59,7 +59,7 @@ def main_loop():
 
 
 
-    logger.info(f"engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
+    logger.debug(f"engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
 
     # print(engagement_state)
     if robot_speaking:
@@ -78,7 +78,7 @@ def main_loop():
 
     if hardware_interrupt:
         logger.info("Hardware Bardging in detected")
-
+        # TODO: Handle hardware interruption
         # After handling hardware interruption
         hardware_interrupt = False
         return 
@@ -102,11 +102,12 @@ def main_loop():
         sentence_heard = time_window.get_cached_sentences()
         logger.info(f"User stoped speaking as word stream input timeout. Start to trigger chatbot. \nSentence heard: {sentence_heard}")
 
+        # TODO: communicate with chatbot to get a response sentence
         default_action = multithread_action_wrapper()
         default_action.start()
 
 
-    # If patient is not speaking now, we think of replies.
+    # If patient is not speaking now, we think of re-engages. This state patient generally don't reply.
     elif user_speaking_state == 0:
         # Handle the emergency stop when patient stop speaking
         if emergency_stop_flag:
