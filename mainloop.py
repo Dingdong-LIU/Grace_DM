@@ -45,8 +45,6 @@ def main_loop():
         asr (_type_): _description_
     """
 
-    # # print(asr_listener.asr_full_sentence) # For debug Only
-    # logger.info("enter main loop")
 
     global emergency_stop_flag
     global user_speaking_state
@@ -54,18 +52,18 @@ def main_loop():
     global hardware_interrupt
     global performance_end_timestamp
 
-
-    ## Check if Grace is speaking, then don't do anything except for tracking engagement level
+    # Get patient's engagement level
     engagement_state = em.update_engagement_level()
-
-    user_speaking_state = time_window.check_asr_input()
+    # Get user's speaking status
     # receive word --> speaking; receive sentence --> not speaking
+    user_speaking_state = time_window.check_asr_input()
 
 
 
     logger.debug(f"engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
-
     # print(engagement_state)
+    ## Check if Grace is speaking, then don't do anything except for tracking engagement level
+
     if robot_speaking:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
@@ -76,8 +74,6 @@ def main_loop():
             # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
             # exit(0) # to be replaced by Gracefully end.
             return
-        # if user_speaking_state == 1 or 2:
-        #     logger.info("Bardging in detected via software")
         return
 
     if hardware_interrupt:
@@ -87,7 +83,6 @@ def main_loop():
         hardware_interrupt = False
         return 
 
-    
 
 
     # If patient is speaking, we only run emotion and vision analysis. We will wait for chatbot to generate a reply.

@@ -12,21 +12,44 @@ import logging
 
 
 class action_trigger:
-    def __init__(self) -> None:
+    def __init__(self, lang='yue-Hant-HK') -> None:
         self.logger = logging.getLogger()
         self.grace_api_configs = self.loadConfigs()
         #Ros routine
         #self.node = rospy.init_node("exec_test")
         rospy.wait_for_service(self.grace_api_configs['Ros']['grace_behavior_service'], timeout=3)
         self.grace_behavior_client = rospy.ServiceProxy(self.grace_api_configs['Ros']['grace_behavior_service'], grace_attn_msgs.srv.GraceBehavior)
+        self.lang = lang
 
         self.req = grace_attn_msgs.srv.GraceBehaviorRequest()
 
-    def compose_req(self, utterance:str, params:dict):
+    def compose_req(self, command:str, utterance:str, params:dict) -> grace_attn_msgs.srv.GraceBehaviorRequest:
+        """Compose a string using params and command
+
+        Args:
+            command (str): Command for Grace Robot, can only be 'exec' or 'stop'
+            utterance (str): A string for Grace to speak
+            params (dict): a set of params
+
+        Returns:
+            grace_attn_msgs.srv.GraceBehaviorRequest: a request
+        """
         self.req = grace_attn_msgs.srv.GraceBehaviorRequest(**params)
         self.req.utterance = utterance
-
+        self.req.command = command
+        self.req.lang = self.lang
         return self.req
+    
+    def send_request(self, req:grace_attn_msgs.srv.GraceBehaviorRequest) -> str:
+        """execute the request and send reply
+
+        Args:
+            req (grace_attn_msgs.srv.GraceBehaviorRequest): can be (1) "completed", meaning that Grace completed the execution without noticing any interruption (2) "interrupted", meaning that Grace was interruped by her interlocutor and has to stop the speech execution as a reaction mid-way. or (3) "stopped", meaning the stop behavior command has been executed.
+        Returns:
+            _type_: _description_
+        """
+        success_state = self.grace_behavior_client(req).result
+        return success_state
 
     def test_send_request(self):
         print("start to wait for service to finish")
