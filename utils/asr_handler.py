@@ -2,7 +2,7 @@ import rospy
 import dynamic_reconfigure.client
 import hr_msgs
 import time
-from logging import Logger
+from logging import Logger, getLogger
 
 class ASR_Word_Stream:
     """This class listens to ASR word stream.
@@ -24,13 +24,13 @@ class ASR_Word_Stream:
         self.word = ""
         self.timestamp = 0
         self.new_word = False
-        # self.logger = logger
+        self.logger = getLogger()
 
     def callback(self, msg):
         self.word = msg.utterance
         self.timestamp = time.time()
         self.new_word = True
-        print(self.word)
+        self.logger.info(self.word)
     
     def get_time_stamp(self):
         output = (self.new_word, self.timestamp)
