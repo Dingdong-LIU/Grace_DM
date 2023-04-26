@@ -8,6 +8,7 @@ import hr_msgs.msg
 import hr_msgs.cfg
 import hr_msgs.srv
 import std_msgs
+import logging
 
 
 class action_trigger:
@@ -19,6 +20,7 @@ class action_trigger:
         self.grace_behavior_client = rospy.ServiceProxy(self.grace_api_configs['Ros']['grace_behavior_service'], grace_attn_msgs.srv.GraceBehavior)
 
         self.req = grace_attn_msgs.srv.GraceBehaviorRequest()
+        self.logger = logging.getLogger()
 
     def open_database(self):
         return 
@@ -40,9 +42,9 @@ class action_trigger:
         req.ges_mag = self.grace_api_configs['Debug']['Sample']['ges_mag']
 
         #Call the service
-        print("start to wait for service to finish")
+        self.logger.info("start to wait for service to finish")
         success_state = self.grace_behavior_client(req)
-        print("Service call response is:\n %s" % success_state)
+        self.logger.info("Service call response is:\n %s" % success_state)
         # rospy.wait_for_service(self.grace_api_configs['Ros']['grace_behavior_service'], timeout=6)
 
 
@@ -51,7 +53,7 @@ class action_trigger:
         #Load configs
         with open("/home/grace_team/HKUST_GRACE/Grace_Project/Grace_DM/config/robot_api.yaml", "r") as config_file:
             grace_api_configs = yaml.load(config_file, Loader=yaml.FullLoader)
-            print("Read successful")
+            self.logger.info("Read successful")
         return grace_api_configs
     
     def loopup_sentence_configs(self, sentence:str) -> grace_attn_msgs.srv.GraceBehaviorRequest:

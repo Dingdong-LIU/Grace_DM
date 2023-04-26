@@ -22,53 +22,54 @@ class time_window_manager:
         self.last_update_time = 0
         self.asr_word_stream = ASR_Word_Stream(args)
         self.asr_full_sentence = ASR_Full_Sentence(args, self.logger)
-        self.timeout = time_window 
+        self.timeout = time_window
+        self.heard_sentences = []
 
-    # def asr_input(self) -> None:
-    #     """Change state to TRUE (ASR state)
-    #     """
-    #     self.state = True
-    
-    # def no_asr(self) -> None:
-    #     """Change state to False (NO_ASR state)
-    #     """
-    #     self.state = False
 
     def check_asr_input(self) -> int:
         """Check what is the ASR state with time_window as timeout.
 
         Returns:
-            int: 0: no speaking; 1 heard words, the user is speaking; 2 heard sentence, submit to chatbot.
+            int: 0: no speaking; 1 heard words, the user is speaking; 2 heard sentence, the user is speaking 3 submit to chatbot state (should be very short).
         """
         current_time = time.time()
         new_word, last_word_time = self.asr_word_stream.get_time_stamp()
         new_sentence, last_sentence_time = self.asr_full_sentence.get_time_stamp()
         if self.state == 0: # no speaking state
-            if new_word:
+            if new_sentence:
+                # enter the "heard sentence state", cache sentences
+                self.state = 2
+                self.heard_sentences.append(self.asr_full_sentence.get_full_sentence()[1])
+            elif not new_sentence and new_word:
                 self.state = 1
             else:
                 self.state = 0
-            if new_sentence:
+        elif self.state == 1:
+            if new_sentence: 
+                # enter the "heard sentence state", start to cache sentences
                 self.state = 2
-        if self.state == 1:
-            if current_time - last_word_time > self.timeout:
-                self.state = 0
-            elif new_sentence:
-                self.state = 2
-            elif new_word:
+                self.heard_sentences.append(self.asr_full_sentence.get_full_sentence()[1])
+            elif not new_sentence and new_word:
                 self.state = 1
-        if self.state == 2:
+            elif current_time - last_word_time > self.timeout: # check for timeout
+                self.state = 0
+        elif self.state == 2:
             if new_sentence:
                 self.state = 2
-            elif new_word:
+                self.heard_sentences.append(self.asr_full_sentence.get_full_sentence()[1])
+            elif not new_sentence and new_word:
                 self.state = 2
             elif current_time - last_word_time > self.timeout:
-                self.state = 1
-            # elif current_time - last_sentence_time > self.timeout:
-            #     self.state = 0
-            
+                #timeout for "heard sentence state"
+                self.state = 3 # need to submit to chatbot at once. Call get_cache_sentences to clear the cache
+        else: # self.state==3
+            self.state = 0
+
         return self.state
 
+    def get_cached_sentences(self):
+        self.heard_sentences = []
+        return " ".join(self.heard_sentences)
 
 
 class engagement_estimator:

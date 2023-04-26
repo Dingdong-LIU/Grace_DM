@@ -25,9 +25,11 @@ class multithread_action_wrapper(Thread):
     def run(self):
         global robot_speaking
         global logger
+        global hardware_interrupt
         logger.info("Start to pass actions to robot")
         robot_speaking = True
-        robot_connector.test_send_request()
+        execution_result = robot_connector.test_send_request()
+        hardware_interrupt = (execution_result == "interrupted")
         robot_speaking = False
 
 
@@ -45,9 +47,7 @@ def main_loop():
     global emergency_stop_flag
     global user_speaking_state
     global robot_speaking
-    # global em
-    # global logger
-    # global time_window
+    global hardware_interrupt
 
 
     ## Check if Grace is speaking, then don't do anything except for tracking engagement level
@@ -71,13 +71,19 @@ def main_loop():
             # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
             # exit(0) # to be replaced by Gracefully end.
             return
-        if user_speaking_state == 1:
-            logger.debug("Bardging in detected.")
+        if user_speaking_state == 1 or 2:
+            logger.debug("Bardging in detected via software")
         return
+
+    if hardware_interrupt:
+        logger.debug("Hardware Bardging in detected")
+        return 
+
+    
 
 
     # If patient is speaking, we only run emotion and vision analysis. We will wait for chatbot to generate a reply.
-    if user_speaking_state == 1:
+    if user_speaking_state == 1 or user_speaking_state == 2:
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
             logger.debug("Currently Agitated. Patient is agitated when he is speaking")
@@ -86,25 +92,11 @@ def main_loop():
             # 1. Pass an emergency stop to Grace. 
             # 2. Stop the chatbot when patient finish speaking. Set a stoping flag
             return
-    # When ASR recieves a full sentence, send it to chat bot immediately
-    elif user_speaking_state == 2:
-        
+        logger.info("At this time user is speaking, need wait (do nothing) till he finish")
+    # When ASR receives a full sentence, and decided to send it to chat bot
+    elif user_speaking_state == 3:
 
-        # wait_user_till_he_stop
-        # wait = True
-        # while wait:
-        #     wait, user_input = asr_listener.get_full_sentence()
-        #     print(wait)
-        #     time.sleep(0.2)
-        # wait, user_input = asr_listener.get_full_sentence()
-
-        # TODO: An await function to wait for chatbot reply.
-        # await for asr_listener
-        #time.sleep(2)
-        # TEST:
-        # robot_speaking = True
-        # exe_state = robot_connector.test_send_request()
-        # robot_speaking = False
+        logger.info("User stoped speaking as word stream input timeout. Start to trigger chatbot.")
 
         default_action = multithread_action_wrapper()
         default_action.start()
@@ -136,7 +128,7 @@ def main_loop():
             emergency_stop_flag = True
             return
     else:
-        logger.error(f"user speaking state not in 1,2,3, is {user_speaking_state}")
+        logger.error(f"user speaking state not in 0,1,2,3, is {user_speaking_state}")
         sys.exit(-1)
 
         
@@ -193,6 +185,8 @@ if __name__ == "__main__":
     robot_speaking = False
     # Whether to have emergency stop
     emergency_stop_flag = False
+    # whether robot is interrupted
+    hardware_interrupt = False
 
     #Yifan note: put an infinite loop here just for testing
     rate = rospy.Rate(10)#30hz
