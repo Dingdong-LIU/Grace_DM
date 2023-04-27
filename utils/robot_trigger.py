@@ -130,7 +130,7 @@ class stop_trigger:
         #     #Kill the current process
         #     os.system('kill ' + str(os.getpid()))
 
-
-
+    def stop_pub(self):
+        self.stop_pub(std_msgs.msg.Bool(True))
 
 

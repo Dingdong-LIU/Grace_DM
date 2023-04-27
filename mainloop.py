@@ -56,6 +56,9 @@ def gracefully_end(error_message):
     robot_connector.send_request(req)
     robot_connector.stop_conversation(error_message=error_message)
 
+    #Broadcast a stop message
+    stop_command.stop_pub()
+
     #Kill the DM process on stop
     print('Now killing the process.')
     sys.exit(0) 
@@ -76,6 +79,7 @@ def main_loop():
     global hardware_interrupt
     # global performance_end_timestamp
     global distraction_window_time_stamp
+    global ugly_end_questionnaire_flag
     global time_repeat
 
     # Get patient's engagement level
@@ -93,6 +97,14 @@ def main_loop():
     if(ugly_end_questionnaire_flag and (not robot_speaking)):
         #Kill the process
         print('End of questionnaire.')
+        sys.exit(0) 
+
+    if( ugly_emergency_end_flag and (not robot_speaking)):
+        #Broadcast a stop message
+        stop_command.stop_pub()
+
+        #Kill the DM process on stop
+        print('Now killing the process.')
         sys.exit(0) 
 
 
@@ -182,8 +194,13 @@ def main_loop():
 
         #Check if it's the finished intent
         if( res['responses']['intent'] == end_questionnaire_intent_string):
+            logger.info(f"Triggering end questionnaire flag since we reach the intent: {res['responses']['intent']}")
             ugly_end_questionnaire_flag = True
 
+        #this is only triggered by very violent intent like "I'll hit you!!" 
+        if( res['responses']['intent'] == emergency_exit_intent_string):
+            logger.info(f"Triggering emergency end flag since we reach the intent: {res['responses']['intent']}")
+            ugly_emergency_end_flag = True
 
 
     # If patient is not speaking now, we think of re-engages. This state patient generally don't reply.
@@ -213,7 +230,7 @@ def main_loop():
             #time.sleep(2)
             time_repeat += 1
             ask_for_repeat(error_message="No feedback from patients and patient is distracted, asking robot to repeat")
-            if time_repeat > 1:
+            if time_repeat > 2:
                 gracefully_end(error_message)(error_message="Repeated but patient don't get engaged: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
             return
         elif engagement_state == "Agitated":
@@ -302,6 +319,7 @@ if __name__ == "__main__":
     stare_but_not_talk_timeout = 15 # in seconds
     time_repeat = 0
     end_questionnaire_intent_string = '(Q10.Success) Repeat Address'
+    emergency_exit_intent_string = '(Special) Emergency'
 
 
     # Trigger the initial greetings
