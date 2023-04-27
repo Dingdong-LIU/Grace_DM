@@ -12,5 +12,11 @@ class database_reader():
         lookup_result['expressions'] = [df_line["POSES"].item()]
         lookup_result['exp_start'] = [df_line["E_Start (%)"].item()/100]
         lookup_result['exp_end'] = [df_line["E_End (%)"].item()/100]
-        lookup_result['exp_mag'] = [df_line["Magnitude"].item()]
+        lookup_result['exp_mag'] = [df_line["E_Magnitude"].item()]
+
+        lookup_result['gestures'] = [df_line["GESTURES"].item()]
+        lookup_result['ges_start'] = [df_line["G_Start (%)"].item()/100]
+        lookup_result['ges_end'] = [df_line["G_End (%)"].item()/100]
+        lookup_result['ges_mag'] = [df_line["G_Magnitude"].item()]
+
         return lookup_result

@@ -318,7 +318,7 @@ if __name__ == "__main__":
     performance_end_timestamp = 0
     distraction_window_time_stamp = 0
     distraction_time = 4 # in seconds
-    stare_but_not_talk_timeout = 15 # in seconds
+    stare_but_not_talk_timeout = 10 # in seconds
     time_repeat = 0
     end_questionnaire_intent_string = '(Q10.Success) Repeat Address'
     emergency_exit_intent_string = '(Special) Emergency'
