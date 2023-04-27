@@ -3,6 +3,9 @@ import grace_attn_msgs
 from collections import deque, Counter
 
 class Emotion_Recognition_Handeler:
+    debug_queue_length = 50
+
+
     def __init__(self, args) -> None:
         #rospy.init_node("emotion_recognition_node")
         self.emotion_sub = rospy.Subscriber(
@@ -11,8 +14,8 @@ class Emotion_Recognition_Handeler:
             callback=self.callback,
             queue_size=100
         )
-        self.attention = deque([""]*10, maxlen=10)
-        self.emotion = deque([""]*10, maxlen=10)
+        self.attention = deque([""]*self.debug_queue_length, maxlen=self.debug_queue_length)
+        self.emotion = deque([""]*self.debug_queue_length, maxlen=self.debug_queue_length)
         self.visualization_frame = None # This one is of no use, so not updated
 
 

@@ -29,12 +29,14 @@ class multithread_action_wrapper(Thread):
         global logger
         global hardware_interrupt
         global performance_end_timestamp
+        global distraction_window_time_stamp
         logger.info("Start to pass actions to robot")
         robot_speaking = True
         execution_result = function_template(req)
         logger.info("Execution result %s" % execution_result)
         hardware_interrupt = (execution_result == "interrupted")
         robot_speaking = False
+        distraction_window_time_stamp = time.time()
         performance_end_timestamp = time.time()
 
 def ask_for_repeat(error_message):
@@ -65,6 +67,7 @@ def main_loop():
     global robot_speaking
     global hardware_interrupt
     # global performance_end_timestamp
+    global distraction_window_time_stamp
     global time_repeat
 
     # Get patient's engagement level
@@ -103,6 +106,8 @@ def main_loop():
         sentence_heard = time_window.get_cached_sentences()
         logger.info(f"User interrupt via Hardware. Now handle user input. Sentence heard: {sentence_heard}")
 
+        #We decide to handle bardging by not doing anything
+        '''
         # FINISH: communicate with chatbot to get a response sentence
         # default_action = multithread_action_wrapper()
         # default_action.start()
@@ -114,6 +119,7 @@ def main_loop():
         # multithread performance trigger
         multithread_action = multithread_action_wrapper()
         multithread_action.run(robot_connector.send_request, req)
+        '''
         # ===============
 
         hardware_interrupt = False
@@ -123,6 +129,9 @@ def main_loop():
 
     # If patient is speaking, we only run emotion and vision analysis. We will wait for chatbot to generate a reply.
     if user_speaking_state == 1 or user_speaking_state == 2:
+        #Update two-window time to prevent premaature stopping
+        distraction_window_time_stamp = time.time()
+
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
             # logger.info("Currently Agitated. Patient is agitated when he is speaking")
@@ -156,10 +165,9 @@ def main_loop():
 
     # If patient is not speaking now, we think of re-engages. This state patient generally don't reply.
     elif user_speaking_state == 0:
-
         # If input from user for less than 2 seconds, ignore
         # otherwise treat as distraction
-        if time.time() - performance_end_timestamp < distraction_time:
+        if time.time() - distraction_window_time_stamp < distraction_time:
             return
 
 
@@ -183,7 +191,7 @@ def main_loop():
             time_repeat += 1
             ask_for_repeat(error_message="No feedback from patients and patient is distracted, asking robot to repeat")
             if time_repeat > 1:
-                grace_attn_msgs(error_message="Repeated but patient don't get engaged: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
+                gracefully_end(error_message)(error_message="Repeated but patient don't get engaged: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
             return
         elif engagement_state == "Agitated":
             # logger.info("Patient didn't answer and is agitated, ask robot to gracefully stop at once")
@@ -195,6 +203,7 @@ def main_loop():
             gracefully_end(error_message="Patient didn't answer and is agitated, ask robot to gracefully stop at once. current_state: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
             return
         elif engagement_state == "Engaged":
+            distraction_window_time_stamp = time.time()
             if time.time() - performance_end_timestamp > stare_but_not_talk_timeout:
                 gracefully_end(error_message="Stare too long at Grace.")
     else:
@@ -257,8 +266,9 @@ if __name__ == "__main__":
     hardware_interrupt = False
     # timestamp of finishing performance
     performance_end_timestamp = 0
+    distraction_window_time_stamp = 0
     distraction_time = 2 # in seconds
-    stare_but_not_talk_timeout = 3 # in seconds
+    stare_but_not_talk_timeout = 15 # in seconds
     time_repeat = 0
 
     #Yifan note: put an infinite loop here just for testing
@@ -273,6 +283,7 @@ if __name__ == "__main__":
 
     # update the performance timestamp
     performance_end_timestamp = time.time()
+    distraction_window_time_stamp = time.time()
 
     # make sure that ctrl-c can work
     while not rospy.is_shutdown():

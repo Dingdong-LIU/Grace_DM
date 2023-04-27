@@ -45,7 +45,7 @@ class action_trigger:
         """
         self.req = grace_attn_msgs.srv.GraceBehaviorRequest(**params)
         if utterance == "":
-            utterance = "please repeat empty utterance"
+            utterance = "please repeat"
         self.req.utterance = utterance
         self.req.command = command
         self.req.lang = self.lang
