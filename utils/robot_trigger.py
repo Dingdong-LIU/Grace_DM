@@ -115,7 +115,7 @@ class stop_trigger:
 
         self.stop_sub = rospy.Subscriber(self.stop_topic, std_msgs.msg.Bool, self.stop_msg_callback, queue_size=self.topic_queue_size)
         self.stop_pub = rospy.Publisher(self.stop_topic , std_msgs.msg.Bool, queue_size=self.topic_queue_size)
-        self.start=False
+        self.stop_message=False
     
     def stop_msg_callback(self, msg):
         # Need a message to call the emergency stop function

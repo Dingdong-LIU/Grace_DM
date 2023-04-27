@@ -100,9 +100,9 @@ class engagement_estimator:
         if emotion in ["Anger"]:
             engagement_level = "Agitated"
             print('Anger!!')
-        elif emotion in ["Agitation"]:
-            engagement_level = "Agitated"
-            print('Agitation!!')
+        # elif emotion in ["Agitation"]:
+        #     engagement_level = "Agitated"
+        #     print('Agitation!!')
         elif attention == "False":
             engagement_level = "Distracted"
         elif emotion in ["Abscence", "EXCEPTION!!"]:

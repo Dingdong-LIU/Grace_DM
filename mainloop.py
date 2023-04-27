@@ -21,6 +21,8 @@ from utils.dialog_handler import DIALOG_HANDLR
 
 from threading import Thread
 
+import os
+
 class multithread_action_wrapper(Thread):
     def __init__(self):
         Thread.__init__(self)
@@ -56,7 +58,8 @@ def gracefully_end(error_message):
 
     #Kill the DM process on stop
     print('Now killing the process.')
-    os.system('kill ' + str(os.getpid()))
+    sys.exit(0) 
+
 
 def main_loop():
     """ This is one loop happens in the main frame.
@@ -264,7 +267,7 @@ if __name__ == "__main__":
     # initialize the chatbot upon receiving start message
     while not start_command.start:
         rate.sleep()
-        
+
     chatbot = DIALOG_HANDLR()
 
     # Connector to robot
