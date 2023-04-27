@@ -14,6 +14,7 @@ from utils.start_command_listener import start_command_listener
 from utils.mainloop_manager import time_window_manager, engagement_estimator
 import time
 from utils.robot_trigger import action_trigger
+from utils.robot_trigger import stop_trigger
 from utils.emotion_recognition_handler import Emotion_Recognition_Handeler
 # from utils.data_reader import database_reader
 from utils.dialog_handler import DIALOG_HANDLR
@@ -53,6 +54,10 @@ def gracefully_end(error_message):
     robot_connector.send_request(req)
     robot_connector.stop_conversation(error_message=error_message)
 
+    #Kill the DM process on stop
+    print('Now killing the process.')
+    os.system('kill ' + str(os.getpid()))
+
 def main_loop():
     """ This is one loop happens in the main frame.
     Basically there are 2 stages, listening stage & speaking stage.
@@ -75,6 +80,12 @@ def main_loop():
     # Get user's speaking status
     # receive word --> speaking; receive sentence --> not speaking
     user_speaking_state = time_window.check_asr_input()
+
+
+    #Special handling of the stop message
+    if(stop_command.stop_message):
+        gracefully_end(error_message="Stare too long at Grace.")
+
 
 
 
@@ -224,6 +235,9 @@ if __name__ == "__main__":
     #Yifan edit:
     main_loop_node = rospy.init_node("main_loop")
 
+    #Yifan note: put an infinite loop here just for testing
+    rate = rospy.Rate(10)#30hz
+
     # load configs
     args = load_config("./config/config_full10.json")
 
@@ -233,6 +247,7 @@ if __name__ == "__main__":
     # listener for start button
     # currently not integrated to the mainloop
     start_command = start_command_listener(args, logger)
+    stop_command = stop_trigger(args)
 
     # listener for ASR
     asr_listener = ASR_Full_Sentence(args, logger)
@@ -246,7 +261,10 @@ if __name__ == "__main__":
     # engagement estimator
     em = engagement_estimator(emotion_listener)
 
-    # initialize the chatbot
+    # initialize the chatbot upon receiving start message
+    while not start_command.start:
+        rate.sleep()
+        
     chatbot = DIALOG_HANDLR()
 
     # Connector to robot
@@ -271,8 +289,6 @@ if __name__ == "__main__":
     stare_but_not_talk_timeout = 15 # in seconds
     time_repeat = 0
 
-    #Yifan note: put an infinite loop here just for testing
-    rate = rospy.Rate(10)#30hz
 
     # Trigger the initial greetings
     # TODO:trigger the greeting
