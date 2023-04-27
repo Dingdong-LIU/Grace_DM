@@ -57,7 +57,7 @@ def gracefully_end(error_message):
     robot_connector.stop_conversation(error_message=error_message)
 
     #Broadcast a stop message
-    stop_command.stop_pub()
+    stop_command.pub_stop()
 
     #Kill the DM process on stop
     print('Now killing the process.')
@@ -80,6 +80,7 @@ def main_loop():
     # global performance_end_timestamp
     global distraction_window_time_stamp
     global ugly_end_questionnaire_flag
+    global ugly_emergency_end_flag
     global time_repeat
 
     # Get patient's engagement level
@@ -101,7 +102,7 @@ def main_loop():
 
     if( ugly_emergency_end_flag and (not robot_speaking)):
         #Broadcast a stop message
-        stop_command.stop_pub()
+        stop_command.pub_stop()
 
         #Kill the DM process on stop
         print('Now killing the process.')
@@ -278,6 +279,7 @@ if __name__ == "__main__":
     start_command = start_command_listener(args, logger)
     stop_command = stop_trigger(args)
     ugly_end_questionnaire_flag = False
+    ugly_emergency_end_flag = False
 
     # listener for ASR
     asr_listener = ASR_Full_Sentence(args, logger)
