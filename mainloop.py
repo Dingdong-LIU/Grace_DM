@@ -89,7 +89,11 @@ def main_loop():
     if(stop_command.stop_message):
         gracefully_end(error_message="Stare too long at Grace.")
 
-
+    #Special handling of the end of questionnaire
+    if(ugly_end_questionnaire_flag and (not robot_speaking)):
+        #Kill the process
+        print('End of questionnaire.')
+        sys.exit(0) 
 
 
     logger.debug(f"engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
@@ -176,6 +180,11 @@ def main_loop():
         time_repeat = 0
 
 
+        #Check if it's the finished intent
+        if( res['responses']['intent'] == end_questionnaire_intent_string):
+            ugly_end_questionnaire_flag = True
+
+
 
     # If patient is not speaking now, we think of re-engages. This state patient generally don't reply.
     elif user_speaking_state == 0:
@@ -251,6 +260,7 @@ if __name__ == "__main__":
     # currently not integrated to the mainloop
     start_command = start_command_listener(args, logger)
     stop_command = stop_trigger(args)
+    ugly_end_questionnaire_flag = False
 
     # listener for ASR
     asr_listener = ASR_Full_Sentence(args, logger)
@@ -288,9 +298,10 @@ if __name__ == "__main__":
     # timestamp of finishing performance
     performance_end_timestamp = 0
     distraction_window_time_stamp = 0
-    distraction_time = 2 # in seconds
+    distraction_time = 4 # in seconds
     stare_but_not_talk_timeout = 15 # in seconds
     time_repeat = 0
+    end_questionnaire_intent_string = '(Q10.Success) Repeat Address'
 
 
     # Trigger the initial greetings
