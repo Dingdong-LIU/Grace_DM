@@ -1,3 +1,6 @@
+from __future__ import annotations
+from collections.abc import Callable, Iterable, Mapping
+from typing import Any
 import rospy
 import grace_attn_msgs.msg
 import hr_msgs.msg 
@@ -19,13 +22,15 @@ from utils.emotion_recognition_handler import Emotion_Recognition_Handeler
 # from utils.data_reader import database_reader
 from utils.dialog_handler import DIALOG_HANDLR
 
-from threading import Thread
+from threading import Thread, Event, Lock
+from logging import getLogger
 
 import os
 
 class multithread_action_wrapper(Thread):
-    def __init__(self):
-        Thread.__init__(self)
+    def __init__(self, group: None = None, target: Callable[..., object] | None = None, name: str | None = None, args: Iterable[Any] = ..., kwargs: Mapping[str, Any] | None = None, *, daemon: bool | None = None) -> None:
+        super().__init__(group, target, name, args, kwargs, daemon=daemon)
+        self.logger = getLogger()
     
     def run(self, function_template, req):
         global robot_speaking
@@ -33,14 +38,24 @@ class multithread_action_wrapper(Thread):
         global hardware_interrupt
         global performance_end_timestamp
         global distraction_window_time_stamp
-        logger.info("Start to pass actions to robot")
-        robot_speaking = True
-        execution_result = function_template(req)
-        logger.info("Execution result: %s" % execution_result)
-        hardware_interrupt = (execution_result == "interrupted")
-        robot_speaking = False
-        distraction_window_time_stamp = time.time()
-        performance_end_timestamp = time.time()
+        lock_timeout = 3
+        logger.info(f"Start to wait for passing actions to robot (timeout = {lock_timeout}s for default)")
+        # wait till robot is free to speak
+        if robot_speaking.acquire(timeout=lock_timeout):
+            logger.info("Start to pass actions to robot")
+            execution_result = function_template(req)
+            logger.info("Execution result: %s" % execution_result)
+            hardware_interrupt = (execution_result == "interrupted")
+
+            # release the lock so that other threads can use this
+            robot_speaking.release()
+
+            distraction_window_time_stamp = time.time()
+            performance_end_timestamp = time.time()
+        else:
+            logger.error(f"Cannot accquire lock in {lock_timeout} seconds")
+
+        
 
 def ask_for_repeat(error_message):
     res = chatbot.communicate(args.magic_string["repeat"])
@@ -95,12 +110,12 @@ def main_loop():
         gracefully_end(error_message="Stare too long at Grace.")
 
     #Special handling of the end of questionnaire
-    if(ugly_end_questionnaire_flag and (not robot_speaking)):
+    if(ugly_end_questionnaire_flag and (not robot_speaking.locked())):
         #Kill the process
         print('End of questionnaire.')
         sys.exit(0) 
 
-    if( ugly_emergency_end_flag and (not robot_speaking)):
+    if( ugly_emergency_end_flag and (not robot_speaking.locked())):
         #Broadcast a stop message
         stop_command.pub_stop()
 
@@ -109,11 +124,11 @@ def main_loop():
         sys.exit(0) 
 
 
-    logger.debug(f"engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
+    logger.debug(f"engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking.locked()}")
     # print(engagement_state)
     ## Check if Grace is speaking, then don't do anything except for tracking engagement level
 
-    if robot_speaking:
+    if robot_speaking.locked():
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
             # FINISH: Do something
@@ -215,7 +230,7 @@ def main_loop():
             # logger.info("Emergency stop due to agitation")
             # FINISH: gracefully stop the robot. here I only log the message
             # currently I write a return here, though it won't actually stop the loop
-            gracefully_end(f"Emergency stop due to agitation when he or she is talking (by flag), current_state: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
+            gracefully_end(f"Emergency stop due to agitation when he or she is talking (by flag), current_state: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking.locked()}")
             return
         
         # Patient don't answer with in time_window in if-else branch
@@ -307,7 +322,7 @@ if __name__ == "__main__":
     #Speaking state var
     user_speaking_state = False
     # Whether Grace is speaking
-    robot_speaking = False
+    robot_speaking = Lock()
     # Whether to have emergency stop
     emergency_stop_flag = False
     # whether robot is interrupted
