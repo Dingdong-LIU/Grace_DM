@@ -36,7 +36,7 @@ class multithread_action_wrapper(Thread):
         logger.info("Start to pass actions to robot")
         robot_speaking = True
         execution_result = function_template(req)
-        logger.info("Execution result %s" % execution_result)
+        logger.info("Execution result: %s" % execution_result)
         hardware_interrupt = (execution_result == "interrupted")
         robot_speaking = False
         distraction_window_time_stamp = time.time()
@@ -165,8 +165,6 @@ def main_loop():
 
         if engagement_state == "Agitated":
             # only handle "Agitated" when patient is speaking
-            # logger.info("Currently Agitated. Patient is agitated when he is speaking")
-            # FINISH:
             # Stop the orientation
             # 1. Stop the chatbot when patient finish speaking. Set a stoping flag
             emergency_stop_flag = True

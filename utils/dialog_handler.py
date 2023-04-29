@@ -20,5 +20,5 @@ class DIALOG_HANDLR:
                 "session_id": self.session_id
             }
         )
-        self.logger.debug("Received replies from chatbot due to %s" % asr_text)
+        self.logger.debug("Received replies from chatbot: %s" % str(response.json()))
         return response.json()

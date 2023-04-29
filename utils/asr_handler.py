@@ -30,7 +30,7 @@ class ASR_Word_Stream:
         self.word = msg.utterance
         self.timestamp = time.time()
         self.new_word = True
-        self.logger.info(self.word)
+        self.logger.info(f"ASR_WORD_STREAM: {self.word}")
     
     def get_time_stamp(self):
         output = (self.new_word, self.timestamp)
@@ -89,16 +89,12 @@ class ASR_Full_Sentence:
         self.sentence_format["source"] = msg.source
         self.sentence_format["audio_path"] = msg.audio_path
 
-        #Yifan mod: edited the log text
-        # self.logger.info(f"Send {self.asr_full_sentence} to chatbot")
-        self.logger.info(f"Obtained sentence ({self.asr_full_sentence}) from ASR")
 
-
+        self.logger.info(f"ASR_SENTENCE_STREAM: Obtained sentence ({self.asr_full_sentence}) from ASR")
 
         self.new_sentence = True
         self.timestamp = time.time()
-        # TODO: invoke the Dialogue manager?
-        # send the message to some port XXX?
+
 
     def get_full_sentence(self):
         if self.new_sentence:
