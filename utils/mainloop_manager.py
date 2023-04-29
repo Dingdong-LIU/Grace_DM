@@ -21,7 +21,7 @@ class time_window_manager:
         self.logger = logging.getLogger()
         self.last_update_time = 0
         self.asr_word_stream = ASR_Word_Stream(args)
-        self.asr_full_sentence = ASR_Full_Sentence(args, self.logger)
+        self.asr_full_sentence = ASR_Full_Sentence(args)
         self.timeout = time_window
         self.heard_sentences = []
 
