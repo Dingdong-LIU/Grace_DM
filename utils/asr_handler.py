@@ -45,7 +45,7 @@ class ASR_Sentence_Stream:
 
 
 class ASR_Full_Sentence:
-    def __init__(self, args, logger:Logger) -> None:
+    def __init__(self, args) -> None:
 
         # This is the configuration of ASR. I comment this out as Yifan told me he will handle it on his side. If there's misunderstanding, please uncomment this line.
         # self.asr_language_config = self.ros_dynamic_configuration(lang="HK")
@@ -64,7 +64,7 @@ class ASR_Full_Sentence:
             "lang" : "", "confidence": 0,
             "source" : "", "audio_path": "",
         }
-        self.logger = logger
+        self.logger = getLogger()
 
         self.new_sentence = False
         self.timestamp = 0

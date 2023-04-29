@@ -282,7 +282,7 @@ if __name__ == "__main__":
     ugly_emergency_end_flag = False
 
     # listener for ASR
-    asr_listener = ASR_Full_Sentence(args, logger)
+    asr_listener = ASR_Full_Sentence(args)
 
     # Emotion listener
     emotion_listener = Emotion_Recognition_Handeler(args)
