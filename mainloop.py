@@ -232,7 +232,7 @@ def main_loop():
             time_repeat += 1
             ask_for_repeat(error_message="No feedback from patients and patient is distracted, asking robot to repeat")
             if time_repeat > 2:
-                gracefully_end(error_message)(error_message="Repeated but patient don't get engaged: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
+                gracefully_end(error_message="Repeated but patient don't get engaged: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
             return
         elif engagement_state == "Agitated":
             # logger.info("Patient didn't answer and is agitated, ask robot to gracefully stop at once")
