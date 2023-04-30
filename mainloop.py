@@ -62,13 +62,23 @@ def ask_for_repeat(error_message):
     utterance, params = robot_connector.parse_reply_from_chatbot(res=res)
     req = robot_connector.compose_req(command='exec', utterance=utterance, params=params)
     logger.error(f"Repeat due to {error_message}")
-    robot_connector.send_request(req)
+    # robot_connector.send_request(req)
+    multithread_action = multithread_action_wrapper()
+    multithread_action.run(robot_connector.send_request, req)
+    # wait for it to finish
+    multithread_action.join()
 
 def gracefully_end(error_message):
     res = chatbot.communicate(args.magic_string["gracefully_end_conversation"])
     utterance, params = robot_connector.parse_reply_from_chatbot(res=res)
     req = robot_connector.compose_req(command='exec', utterance=utterance, params=params)
-    robot_connector.send_request(req)
+    # robot_connector.send_request(req)
+    multithread_action = multithread_action_wrapper()
+    multithread_action.run(robot_connector.send_request, req)
+
+    # wait for action to finish
+    multithread_action.join()
+
     robot_connector.stop_conversation(error_message=error_message)
 
     #Broadcast a stop message
