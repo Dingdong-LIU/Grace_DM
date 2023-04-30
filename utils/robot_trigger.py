@@ -131,6 +131,6 @@ class stop_trigger:
         #     os.system('kill ' + str(os.getpid()))
 
     def pub_stop(self):
-        self.stop_pub(std_msgs.msg.Bool(True))
+        self.stop_pub.publish(std_msgs.msg.Bool(True))
 
 

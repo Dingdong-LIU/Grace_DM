@@ -153,7 +153,6 @@ def main_loop():
         logger.info(f"User interrupt via Hardware. Now handle user input. Sentence heard: {sentence_heard}")
 
         #We decide to handle bardging by not doing anything
-        '''
         # FINISH: communicate with chatbot to get a response sentence
         # default_action = multithread_action_wrapper()
         # default_action.start()
@@ -165,7 +164,7 @@ def main_loop():
         # multithread performance trigger
         multithread_action = multithread_action_wrapper()
         multithread_action.run(robot_connector.send_request, req)
-        '''
+        
         # ===============
 
         hardware_interrupt = False
