@@ -64,7 +64,7 @@ def ask_for_repeat(error_message):
     logger.error(f"Repeat due to {error_message}")
     # robot_connector.send_request(req)
     multithread_action = multithread_action_wrapper()
-    multithread_action.run(robot_connector.send_request, req)
+    multithread_action.start(robot_connector.send_request, req)
     # wait for it to finish
     multithread_action.join()
 
