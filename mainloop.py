@@ -31,7 +31,7 @@ class multithread_action_wrapper(Thread):
     def __init__(self, group: None = None, target: Callable[..., object] | None = None, name: str | None = None, args: Iterable[Any] = ..., kwargs: Mapping[str, Any] | None = None, *, daemon: bool | None = None) -> None:
         super().__init__(group, target, name, args, kwargs, daemon=daemon)
         self.logger = getLogger()
-    
+ 
     def run(self, function_template, req):
         global robot_speaking
         global logger
@@ -151,20 +151,21 @@ def main_loop():
         # ==============
         sentence_heard = time_window.get_cached_sentences()
         logger.info(f"User interrupt via Hardware. Now handle user input. Sentence heard: {sentence_heard}")
+        # Yifan mod: comment out due to empty string logic bug.
+        '''
+            #We decide to handle bardging by not doing anything
+            # FINISH: communicate with chatbot to get a response sentence
+            # default_action = multithread_action_wrapper()
+            # default_action.start()
+            res = chatbot.communicate(sentence_heard)
+            utterance, params = robot_connector.parse_reply_from_chatbot(res=res)
+            req = robot_connector.compose_req(command='exec', utterance=utterance, params=params)
+            # robot_connector.send_request(req) # single thread response
 
-        #We decide to handle bardging by not doing anything
-        # FINISH: communicate with chatbot to get a response sentence
-        # default_action = multithread_action_wrapper()
-        # default_action.start()
-        res = chatbot.communicate(sentence_heard)
-        utterance, params = robot_connector.parse_reply_from_chatbot(res=res)
-        req = robot_connector.compose_req(command='exec', utterance=utterance, params=params)
-        # robot_connector.send_request(req) # single thread response
-
-        # multithread performance trigger
-        multithread_action = multithread_action_wrapper()
-        multithread_action.run(robot_connector.send_request, req)
-        
+            # multithread performance trigger
+            multithread_action = multithread_action_wrapper()
+            multithread_action.run(robot_connector.send_request, req)
+        '''
         # ===============
 
         hardware_interrupt = False
@@ -204,7 +205,6 @@ def main_loop():
         # repeat counter
         time_repeat = 0
 
-
         #Check if it's the finished intent
         if( res['responses']['intent'] == end_questionnaire_intent_string):
             logger.info(f"Triggering end questionnaire flag since we reach the intent: {res['responses']['intent']}")
@@ -243,6 +243,7 @@ def main_loop():
             #time.sleep(2)
             time_repeat += 1
             ask_for_repeat(error_message="No feedback from patients and patient is distracted, asking robot to repeat")
+            print(time_repeat)
             if time_repeat > 2:
                 gracefully_end(error_message="Repeated but patient don't get engaged: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
             return
