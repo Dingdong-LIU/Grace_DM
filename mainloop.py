@@ -64,9 +64,9 @@ def ask_for_repeat(error_message):
     logger.error(f"Repeat due to {error_message}")
     # robot_connector.send_request(req)
     multithread_action = multithread_action_wrapper()
-    multithread_action.start(robot_connector.send_request, req)
+    multithread_action.run(robot_connector.send_request, req)
     # wait for it to finish
-    multithread_action.join()
+    # multithread_action.join()
 
 def gracefully_end(error_message):
     res = chatbot.communicate(args.magic_string["gracefully_end_conversation"])
@@ -77,7 +77,7 @@ def gracefully_end(error_message):
     multithread_action.run(robot_connector.send_request, req)
 
     # wait for action to finish
-    multithread_action.join()
+    # multithread_action.join()
 
     robot_connector.stop_conversation(error_message=error_message)
 
@@ -253,8 +253,7 @@ def main_loop():
             #time.sleep(2)
             time_repeat += 1
             ask_for_repeat(error_message="No feedback from patients and patient is distracted, asking robot to repeat")
-            print(time_repeat)
-            if time_repeat > 2:
+            if time_repeat > 1:
                 gracefully_end(error_message="Repeated but patient don't get engaged: \n engagnement={engagement_state}, user_speaking={user_speaking_state}, robot_speaking={robot_speaking}")
             return
         elif engagement_state == "Agitated":
