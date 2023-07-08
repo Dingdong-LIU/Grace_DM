@@ -13,6 +13,19 @@ import time
 from inspect import getsourcefile
 from os.path import abspath
 
+
+import dynamic_reconfigure.client
+import sensor_msgs.msg
+import std_msgs.msg
+import hr_msgs.msg
+import grace_attn_msgs.msg
+import grace_attn_msgs.srv
+import hr_msgs.msg
+import hr_msgs.cfg
+import hr_msgs.srv
+import std_msgs
+
+
 #Load configs
 def loadConfig(path):
     #Load configs
@@ -61,7 +74,7 @@ import Grace_Instantaneous_Policy
 
 
 
-class DialogueManager:
+class TurnManager:
 
     def __init__(self):
         #Miscellaneous
@@ -75,14 +88,35 @@ class DialogueManager:
         config_path = abspath(getsourcefile(lambda:0)) + "./config/config.yaml"
         self.__config_data = loadConfig(config_path)
 
+
+
+        #Ros related components for calling the behavior executor
+        self.__nh = rospy.init_node(self.__config_data['Ros']['node_name'])
+        self.__grace_behav_client = rospy.ServiceProxy(
+                                        self.__configs['Ros']['grace_behavior_service'], 
+                                        grace_attn_msgs.srv.GraceBehavior)
+
+
+
+
         #Instantiate respective critical components
-        self.__state_monitor_pace = Grace_Pace_Monitor.grace_pace_monitor.PaceMonitor()
+        self.__state_monitor_pace = Grace_Pace_Monitor.grace_pace_monitor.PaceMonitor(self.__nh)
         self.__state_monitor_turn = None
         self.__policy_instantaneous = Grace_Instantaneous_Policy.grace_instantaneous_policy.InstantaneousPolicy()
         self.__policy_turn = None
 
 
+
+
     def __mainLoop(self):
+        #Update respective parts of the turn states
+
+        #Instantaneous and Progressive policies make their decisions
+
+        #Merge the decisions (some aspects are overlapping, e.g., bc and dialogue)
+
+        #Call the uniform behavior handle and execute the actions issued
+
         pass
 
 
