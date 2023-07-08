@@ -100,8 +100,8 @@ class TurnManager:
 
 
         #Instantiate respective critical components
-        self.__state_monitor_pace = Grace_Pace_Monitor.grace_pace_monitor.PaceMonitor(self.__nh)
-        self.__state_monitor_turn = None
+        self.__state_monitor_inst = Grace_Pace_Monitor.grace_instantaneous_state_monitor.InstantaneousStateMonitor(self.__nh)
+        self.__state_monitor_prog = None
         self.__policy_instantaneous = Grace_Instantaneous_Policy.grace_instantaneous_policy.InstantaneousPolicy()
         self.__policy_turn = None
 
