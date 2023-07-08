@@ -65,7 +65,7 @@ def handle_sigint(signalnum, frame):
 
 
 #Load necessary modules
-file_path = abspath(getsourcefile(lambda:0))
+file_path = os.path.dirname(os.path.realpath(getsourcefile(lambda:0)))
 sys.path.insert(0,file_path + '../Grace_Pace_Monitor')
 sys.path.insert(0,file_path + '../Grace_Instantaneous_Policy')
 
@@ -84,8 +84,8 @@ class TurnManager:
                     logging.INFO, 
                     self.__class__.__name__,
                     "./logs/log_" + datetime.now().strftime("%a_%d_%b_%Y_%I_%M_%S_%p"))
-
-        config_path = abspath(getsourcefile(lambda:0)) + "./config/config.yaml"
+        
+        config_path = os.path.dirname(os.path.realpath(getsourcefile(lambda:0))) + "/config/config.yaml"
         self.__config_data = loadConfig(config_path)
 
 
