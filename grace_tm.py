@@ -117,6 +117,14 @@ class TurnManager:
 
         #Call the uniform behavior handle and execute the actions issued
 
+
+        '''
+        Question:
+            Format of template actions (bc)?
+            Format of the output action definitions?
+            Fusing output action"
+        '''
+
         pass
 
 
