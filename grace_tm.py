@@ -66,11 +66,9 @@ def handle_sigint(signalnum, frame):
 
 #Load necessary modules
 file_path = os.path.dirname(os.path.realpath(getsourcefile(lambda:0)))
-sys.path.insert(0,file_path + '../Grace_Pace_Monitor')
-sys.path.insert(0,file_path + '../Grace_Instantaneous_Policy')
-
-import Grace_Pace_Monitor
-import Grace_Instantaneous_Policy
+sys.path.append(os.path.join(file_path, '..'))
+import Grace_Pace_Monitor.grace_instantaneous_state_monitor
+import Grace_Instantaneous_Policy.grace_instantaneous_policy
 
 
 
@@ -91,9 +89,10 @@ class TurnManager:
 
 
         #Ros related components for calling the behavior executor
-        self.__nh = rospy.init_node(self.__config_data['Ros']['node_name'])
+        self.__nh = True
+        rospy.init_node(self.__config_data['Ros']['node_name'])
         self.__grace_behav_client = rospy.ServiceProxy(
-                                        self.__configs['Ros']['grace_behavior_service'], 
+                                        self.__config_data['Ros']['grace_behavior_service'], 
                                         grace_attn_msgs.srv.GraceBehavior)
 
 
@@ -120,7 +119,7 @@ class TurnManager:
         return {'inst_act': instantaneous_actions, 'prog_act': progressive_actions}
 
     def __mergeExec(self, actions):
-        print(actions)
+        self.__logger.info(actions)
 
 
     def mainLoop(self):
@@ -130,11 +129,22 @@ class TurnManager:
             Format of the output action definitions?
             Fusing output action"
         '''
-        rate = rospy.Rate(self.__pace_it_freq)
-
+        rate = rospy.Rate(self.__config_data['General']['main_freq'])
+        it_cnt = 0
         while True:
-            #Update states
-            self.__updateStates()
+            it_cnt = it_cnt + 1
+            print('[Iteration %d]' % it_cnt)
+            if(it_cnt == 1):
+                #Initial state
+
+                #For instantaneous part, initial state is hardcoded, we just reset timestamp
+                self.__state_monitor_inst.initializeState()
+
+                #For progressive part,
+
+            else:
+                #Update states
+                self.__updateStates()
 
             #Apply policies
             actions = self.__applyPolicy()
