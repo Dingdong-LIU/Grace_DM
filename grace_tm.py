@@ -107,24 +107,46 @@ class TurnManager:
 
 
 
-
-    def __mainLoop(self):
-        #Update respective parts of the turn states
-
-        #Instantaneous and Progressive policies make their decisions
-
-        #Merge the decisions (some aspects are overlapping, e.g., bc and dialogue)
-
-        #Call the uniform behavior handle and execute the actions issued
+    def __updateStates(self):
+        self.__state_monitor_inst.updateState()
+        # self.__state_monitor_prog.updateState()
 
 
+    def __applyPolicy(self):
+        instantaneous_actions = self.__policy_instantaneous.applyPolicy(self.__state_monitor_inst.getState())
+        progressive_actions = None
+
+
+        return {'inst_act': instantaneous_actions, 'prog_act': progressive_actions}
+
+    def __mergeExec(self, actions):
+        print(actions)
+
+
+    def mainLoop(self):
         '''
         Question:
             Format of template actions (bc)?
             Format of the output action definitions?
             Fusing output action"
         '''
+        rate = rospy.Rate(self.__pace_it_freq)
 
-        pass
+        while True:
+            #Update states
+            self.__updateStates()
+
+            #Apply policies
+            actions = self.__applyPolicy()
+
+            #Merge and execute actions
+            self.__mergeExec(actions)
+
+            #Sleep by rate
+            rate.sleep()
 
 
+
+if __name__ == '__main__':
+    grace_tm = TurnManager()
+    grace_tm.mainLoop()
